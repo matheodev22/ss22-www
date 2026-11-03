@@ -12,7 +12,6 @@ import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import Admin from "./pages/Admin";
 import Info from "./pages/Info";
-import PaymentResult from "./pages/PaymentResult";
 
 function AppContent() {
   return <><Header/><Routes>
@@ -20,8 +19,7 @@ function AppContent() {
     <Route path="/carrito" element={<Cart/>}/><Route path="/cuenta" element={<Account/>}/><Route path="/checkout" element={<Checkout/>}/>
     <Route path="/pedidos" element={<ProtectedRoute><Orders/></ProtectedRoute>}/>
     <Route path="/admin" element={<ProtectedRoute admin><Admin/></ProtectedRoute>}/>
-    <Route path="/preguntas" element={<Info/>}/><Route path="/pago/resultado" element={<PaymentResult/>}/>
-    <Route path="*" element={<main className="page container empty-state"><h1>Página no encontrada.</h1></main>}/>
+    <Route path="/preguntas" element={<Info/>}/>    <Route path="*" element={<main className="page container empty-state"><h1>Página no encontrada.</h1></main>}/>
   </Routes><Footer/></>;
 }
 export default function App() { return <AuthProvider><AppContent/></AuthProvider>; }

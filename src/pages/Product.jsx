@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Minus, ShoppingBag } from "lucide-react";
 import { getProduct } from "../lib/products";
 import { useCart } from "../context/CartContext";
-import { money, depositFor } from "../lib/format";
+import { money } from "../lib/format";
 
 export default function Product() {
   const { id } = useParams(); const navigate = useNavigate(); const { addItem } = useCart();
@@ -17,9 +17,9 @@ export default function Product() {
         <div className="option-group"><strong>Talle</strong><div className="option-list">{(product.sizes || ["Único"]).map(s => <button key={s} className={size === s ? "selected" : ""} onClick={() => setSize(s)}>{s}</button>)}</div></div>
         {product.colors?.length > 0 && <div className="option-group"><strong>Color</strong><div className="option-list">{product.colors.map(c => <button key={c} className={color === c ? "selected" : ""} onClick={() => setColor(c)}>{c}</button>)}</div></div>}
         <div className="option-group"><strong>Cantidad</strong><div className="quantity-control"><button onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus size={15}/></button><span>{quantity}</span><button onClick={() => setQuantity(quantity + 1)}><Plus size={15}/></button></div></div>
-        <div className="deposit-box"><span>Seña estimada ({product.deposit_percent || 30}%)</span><strong>{money(depositFor(product.price * quantity, product.deposit_percent || 30))}</strong><small>Saldo restante: {money(product.price * quantity - depositFor(product.price * quantity, product.deposit_percent || 30))}</small></div>
+        <div className="deposit-box"><span>Pago por transferencia</span><strong>{money(product.price * quantity)}</strong><small>Se abona el 100% del producto. El envío se coordina aparte.</small></div>
         <button className="button button-dark full-button" onClick={() => { addItem(product, size, color); navigate("/carrito"); }}><ShoppingBag size={17}/> Agregar al carrito</button>
-        <p className="fine-print">Producto por encargo. Plazo estimado de entrega: aproximadamente 30 días, sujeto a variaciones logísticas. La seña y el saldo se detallan antes de confirmar el pago.</p>
+        <p className="fine-print">Producto por encargo. Plazo estimado de entrega: aproximadamente 30 días, sujeto a variaciones logísticas. El pago se realiza por transferencia bancaria del 100%.</p>
       </div>
     </div>
   </main>;

@@ -15,7 +15,7 @@ create table if not exists public.products (
   category text not null default 'Otros',
   description text not null default '',
   price numeric(12,2) not null check (price >= 0),
-  deposit_percent integer not null default 30 check (deposit_percent between 1 and 100),
+  deposit_percent integer not null default 100 check (deposit_percent between 1 and 100),
   image_url text,
   sizes text[] not null default '{}',
   colors text[] not null default '{}',
