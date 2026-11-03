@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { hasSupabase, supabase } from "../lib/supabase";
+import { hasSupabase, supabase, supabaseConfigError } from "../lib/supabase";
 
 const AuthContext = createContext(null);
 
@@ -30,12 +30,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function signIn(email, password) {
-    if (!hasSupabase) throw new Error("Configurá Supabase para habilitar las cuentas.");
+    if (!hasSupabase) throw new Error(supabaseConfigError || "Configurá Supabase para habilitar las cuentas.");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
   }
   async function signUp(email, password, fullName) {
-    if (!hasSupabase) throw new Error("Configurá Supabase para habilitar las cuentas.");
+    if (!hasSupabase) throw new Error(supabaseConfigError || "Configurá Supabase para habilitar las cuentas.");
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
     if (error) throw error;
   }

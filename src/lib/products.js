@@ -5,7 +5,8 @@ export async function getProducts() {
   if (!hasSupabase) return demoProducts;
   const { data, error } = await supabase.from("products").select("*").eq("active", true).order("created_at", { ascending: false });
   if (error) throw error;
-  return data ?? [];
+  // Si la tabla existe pero todavía no cargaste productos, mostramos el catálogo de prueba.
+  return data?.length ? data : demoProducts;
 }
 
 export async function getProduct(id) {
