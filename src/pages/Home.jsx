@@ -7,7 +7,6 @@ import ProductCard from "../components/ProductCard";
 export default function Home() {
   const [products, setProducts] = useState([]);
   useEffect(() => { getProducts().then(setProducts).catch(console.error); }, []);
-  const heroProduct = products.find(p => p.image_url) || products[0];
   const latest = products.slice(0, 4);
   const featured = useMemo(() => products.filter(p => p.featured).slice(0, 4), [products]);
   const categories = useMemo(() => [...new Set(products.map(p => p.category).filter(Boolean))].slice(0, 5), [products]);
@@ -15,18 +14,11 @@ export default function Home() {
 
   return <main className="store-home">
     <section className="campaign-hero">
-      <div className="campaign-image" style={heroProduct?.image_url ? { backgroundImage: `url("${heroProduct.image_url}")` } : undefined}>
-        <div className="campaign-shade" />
+      <div className="campaign-image campaign-image-logo">
+        <img className="campaign-spinning-logo" src="/ss22-logo-original.png" alt="SS22.WWW" />
         <div className="campaign-copy">
-  <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
-
-  <img
-    src="/logo-ss22.png"
-    alt="SS22.WWW"
-    className="campaign-logo"
-  />
-
-  <h1>Vestite<br/><em>a tu manera.</em></h1>
+          <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
+          <h1>Vestite<br/><em>a tu manera.</em></h1>
           <p>Prendas seleccionadas. Nuevos ingresos y piezas para todos los días.</p>
           <Link to="/tienda" className="campaign-button">EXPLORAR TIENDA <ArrowUpRight size={17}/></Link>
         </div>
