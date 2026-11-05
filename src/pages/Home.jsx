@@ -1,90 +1,50 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Truck, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowUpRight, Truck, ShieldCheck, CreditCard } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { getProducts } from "../lib/products";
 import ProductCard from "../components/ProductCard";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
+  useEffect(() => { getProducts().then(setProducts).catch(console.error); }, []);
+  const heroProduct = products.find(p => p.image_url) || products[0];
+  const latest = products.slice(0, 4);
+  const featured = useMemo(() => products.filter(p => p.featured).slice(0, 4), [products]);
+  const categories = useMemo(() => [...new Set(products.map(p => p.category).filter(Boolean))].slice(0, 5), [products]);
+  const categoryProducts = categories.map(category => ({ category, product: products.find(p => p.category === category && p.image_url) })).filter(x => x.product);
 
-  useEffect(() => {
-    getProducts().then(setProducts).catch(console.error);
-  }, []);
-
-  const featured = products.filter((product) => product.featured);
-  const newItems = products.slice(0, 4);
-  const featuredItems = (featured.length ? featured : products).slice(0, 4);
-  const categories = [...new Set(products.map((product) => product.category).filter(Boolean))].slice(0, 6);
-
-  return (
-    <main className="ss22-home">
-      <section className="ss22-hero">
-        <div className="ss22-hero-top">
-          <span>BUENOS AIRES · ARGENTINA</span>
-          <span>INDUMENTARIA SELECCIONADA</span>
+  return <main className="store-home">
+    <section className="campaign-hero">
+      <div className="campaign-image" style={heroProduct?.image_url ? { backgroundImage: `url("${heroProduct.image_url}")` } : undefined}>
+        <div className="campaign-shade" />
+        <div className="campaign-copy">
+          <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
+          <h1>Vestite<br/><em>a tu manera.</em></h1>
+          <p>Prendas seleccionadas. Nuevos ingresos y piezas para todos los días.</p>
+          <Link to="/tienda" className="campaign-button">EXPLORAR TIENDA <ArrowUpRight size={17}/></Link>
         </div>
-        <div className="ss22-hero-center">
-          <img src="/ss22-logo-original.png" alt="SS22.WWW" className="ss22-main-logo" />
-          <p>Prendas seleccionadas. Identidad propia.</p>
-          <Link to="/tienda" className="ss22-main-link">EXPLORAR TIENDA <ArrowUpRight size={16} /></Link>
-        </div>
-        <div className="ss22-hero-bottom">
-          <span>STREETWEAR & CULTURA</span>
-          <span>ENVÍOS A TODO EL PAÍS</span>
-          <span>SS22.WWW</span>
-        </div>
-      </section>
-
-      <div className="ss22-benefits">
-        <span><Truck size={15} /> ENVÍOS A TODO EL PAÍS</span>
-        <i />
-        <span><ShieldCheck size={15} /> COMPRA SEGURA</span>
-        <i />
-        <span>STOCK LIMITADO</span>
+        <span className="campaign-index">NUEVA COLECCIÓN / 2026</span>
       </div>
+    </section>
 
-      {categories.length > 0 && (
-        <section className="ss22-categories container">
-          <div className="ss22-section-label"><span>01 / CATEGORÍAS</span><span>SS22.WWW</span></div>
-          <div className="ss22-category-list">
-            {categories.map((category) => (
-              <Link key={category} to="/tienda">{category}<ArrowUpRight size={15} /></Link>
-            ))}
-            <Link to="/tienda" className="ss22-category-all">VER TODO <ArrowUpRight size={15} /></Link>
-          </div>
-        </section>
-      )}
+    <section className="store-benefits container">
+      <div><Truck/><span><b>Envíos a todo el país</b><small>Elegí cómo recibir tu pedido</small></span></div>
+      <div><ShieldCheck/><span><b>Compra segura</b><small>Seguimiento desde tu cuenta</small></span></div>
+      <div><CreditCard/><span><b>Pago coordinado</b><small>Transferencia bancaria</small></span></div>
+    </section>
 
-      <section className="ss22-products-section container">
-        <div className="ss22-section-heading">
-          <div><span className="ss22-kicker">02 / RECIÉN LLEGADO</span><h2>Novedades</h2></div>
-          <Link to="/tienda">VER TODAS <ArrowUpRight size={16} /></Link>
-        </div>
-        <div className="product-grid ss22-product-grid">
-          {newItems.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
-        {!products.length && <p className="ss22-empty">Próximamente nuevas prendas.</p>}
-      </section>
+    {categoryProducts.length > 0 && <section className="store-categories container">
+      <div className="store-section-head"><div><span className="store-overline">ENCONTRÁ TU ESTILO</span><h2>Comprar por categoría</h2></div><Link to="/tienda">VER TODO <ArrowUpRight size={15}/></Link></div>
+      <div className="category-tiles">{categoryProducts.map(({category, product}, i) => <Link key={category} to={`/tienda?categoria=${encodeURIComponent(category)}`} className={`category-tile category-tile-${i % 3}`}><img src={product.image_url} alt={category}/><span>{category}<ArrowUpRight size={16}/></span></Link>)}</div>
+    </section>}
 
-      {featuredItems.length > 0 && (
-        <section className="ss22-products-section ss22-featured-section">
-          <div className="container">
-            <div className="ss22-section-heading">
-              <div><span className="ss22-kicker">03 / SELECCIÓN SS22</span><h2>Destacados</h2></div>
-              <Link to="/tienda">VER CATÁLOGO <ArrowUpRight size={16} /></Link>
-            </div>
-            <div className="product-grid ss22-product-grid">
-              {featuredItems.map((product) => <ProductCard key={product.id} product={product} />)}
-            </div>
-          </div>
-        </section>
-      )}
+    <section className="store-products container">
+      <div className="store-section-head"><div><span className="store-overline">LO ÚLTIMO EN SS22</span><h2>Nuevos ingresos</h2></div><Link to="/tienda">VER CATÁLOGO <ArrowUpRight size={15}/></Link></div>
+      {latest.length ? <div className="product-grid store-product-grid">{latest.map(p => <ProductCard key={p.id} product={p}/>)}</div> : <p className="store-empty">Próximamente vas a encontrar nuevas prendas acá.</p>}
+    </section>
 
-      <section className="ss22-bottom-cta container">
-        <img src="/ss22-logo-original.png" alt="SS22.WWW" />
-        <div><span>SS22.WWW — BUENOS AIRES</span><h2>Encontrá tu próxima prenda.</h2></div>
-        <Link to="/tienda" aria-label="Ir a la tienda"><ArrowUpRight size={22} /></Link>
-      </section>
-    </main>
-  );
+    {featured.length > 0 && <section className="store-featured"><div className="container store-products"><div className="store-section-head"><div><span className="store-overline">SELECCIÓN DE LA CASA</span><h2>Destacados</h2></div><Link to="/tienda">DESCUBRIR MÁS <ArrowUpRight size={15}/></Link></div><div className="product-grid store-product-grid">{featured.map(p => <ProductCard key={p.id} product={p}/>)}</div></div></section>}
+
+    <section className="store-signoff container"><img src="/ss22-logo-original.png" alt="SS22.WWW"/><div><span>SS22.WWW · INDUMENTARIA</span><h2>Encontrá eso que estabas buscando.</h2></div><Link to="/tienda" aria-label="Ver tienda"><ArrowUpRight/></Link></section>
+  </main>;
 }
