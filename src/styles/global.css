@@ -359,3 +359,47 @@
  .hero-copy-bottom{align-items:flex-start;flex-direction:column;gap:12px}
 }
 @media(prefers-reduced-motion:reduce){.home-marquee-track{animation:none}}
+
+/* SS22 clean storefront refresh — monochrome, product-led, no campaign video */
+.ss22-home{background:#fff;color:#111}
+.ss22-home .container{width:min(1320px,calc(100% - 80px))}
+.ss22-hero{min-height:570px;padding:22px 40px 20px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;border-bottom:1px solid #e9e9e9}
+.ss22-hero-top,.ss22-hero-bottom{display:flex;justify-content:space-between;gap:16px;color:#777;font-size:9px;letter-spacing:1.45px}
+.ss22-hero-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:55px 0 45px}
+.ss22-main-logo{display:block;width:min(58vw,560px);height:auto;max-height:190px;object-fit:contain;object-position:center}
+.ss22-hero-center p{margin:22px 0 22px;color:#666;font-size:12px;letter-spacing:.25px}
+.ss22-main-link{display:inline-flex;align-items:center;gap:18px;padding:13px 17px;border:1px solid #111;font-size:9px;letter-spacing:1.1px;transition:background .2s,color .2s}
+.ss22-main-link:hover{background:#111;color:#fff}
+.ss22-benefits{min-height:54px;display:flex;align-items:center;justify-content:center;gap:30px;border-bottom:1px solid #e9e9e9;color:#333;font-size:9px;letter-spacing:.85px}
+.ss22-benefits span{display:flex;align-items:center;gap:9px}.ss22-benefits svg{stroke-width:1.4}.ss22-benefits i{width:1px;height:15px;background:#ddd}
+.ss22-categories{padding-top:68px;padding-bottom:25px}
+.ss22-section-label{display:flex;justify-content:space-between;color:#888;font-size:9px;letter-spacing:1.3px;margin-bottom:17px}
+.ss22-category-list{display:flex;flex-wrap:wrap;gap:9px}
+.ss22-category-list a{display:flex;align-items:center;gap:15px;padding:13px 15px;border:1px solid #e2e2e2;font-size:10px;text-transform:uppercase;letter-spacing:.6px;transition:all .2s}
+.ss22-category-list a:hover,.ss22-category-list a.ss22-category-all{background:#111;border-color:#111;color:#fff}
+.ss22-products-section{padding-top:45px;padding-bottom:76px}
+.ss22-section-heading{display:flex;justify-content:space-between;align-items:end;margin-bottom:25px}
+.ss22-kicker{display:block;color:#888;font-size:9px;letter-spacing:1.5px;margin-bottom:9px}
+.ss22-section-heading h2{font:500 clamp(31px,4vw,43px)/1.05 'Space Grotesk',sans-serif;letter-spacing:-1.8px;margin:0}
+.ss22-section-heading>a{display:flex;align-items:center;gap:8px;font-size:9px;letter-spacing:1px;border-bottom:1px solid #999;padding-bottom:7px}
+.ss22-product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.ss22-product-grid .product-image{height:auto;aspect-ratio:3/4;background:#f3f3f1}
+.ss22-product-grid .product-image img{filter:none}
+.ss22-product-grid .image-tag{background:#fff;color:#111;font-size:8px}
+.ss22-product-grid .quick-arrow{background:#fff;color:#111}
+.ss22-product-grid .product-info h3{font:500 13px 'DM Sans',sans-serif;letter-spacing:0}
+.ss22-featured-section{background:#f7f7f6;padding-top:68px;padding-bottom:78px}
+.ss22-empty{padding:35px 0;color:#888;font-size:12px}
+.ss22-bottom-cta{padding-top:44px;padding-bottom:44px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid #e5e5e5}
+.ss22-bottom-cta img{width:100px;height:40px;object-fit:contain;object-position:left center}
+.ss22-bottom-cta div{margin-right:auto}.ss22-bottom-cta span{font-size:8px;letter-spacing:1.2px;color:#888}.ss22-bottom-cta h2{font:500 20px 'Space Grotesk';margin:6px 0 0;letter-spacing:-.5px}
+.ss22-bottom-cta>a{width:42px;height:42px;display:grid;place-items:center;border:1px solid #111;transition:all .2s}.ss22-bottom-cta>a:hover{background:#111;color:#fff}
+/* Header aligned with the clean reference */
+.site-header .topline{background:#111;color:#eee;font-size:8px;letter-spacing:1.5px;padding:9px 12px}
+.site-header{background:#fff;border-bottom:1px solid #e8e8e8}
+.site-header .nav-wrap{height:74px}
+.site-header .main-nav{color:#333;font-size:11px;gap:30px}
+.site-header .brand-logo{max-width:116px;max-height:44px;object-fit:contain}
+.site-header .cart-link span{background:#111}
+@media(max-width:900px){.ss22-product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 14px}.ss22-hero{min-height:490px}.ss22-main-logo{width:min(70vw,500px)}}
+@media(max-width:600px){.ss22-home .container{width:calc(100% - 30px)}.ss22-hero{min-height:420px;padding:16px 16px 15px}.ss22-hero-top,.ss22-hero-bottom{font-size:7px;letter-spacing:.8px}.ss22-main-logo{width:82vw;max-height:125px}.ss22-hero-center{padding:45px 0}.ss22-hero-center p{font-size:10px;margin:18px 0}.ss22-benefits{gap:11px;min-height:48px;font-size:7px;letter-spacing:.2px}.ss22-benefits span{gap:5px}.ss22-benefits svg{width:12px}.ss22-categories{padding-top:43px}.ss22-category-list{gap:6px}.ss22-category-list a{font-size:8px;padding:10px 11px;gap:8px}.ss22-products-section{padding-top:35px;padding-bottom:48px}.ss22-section-heading{align-items:end;gap:12px}.ss22-section-heading h2{font-size:30px}.ss22-section-heading>a{font-size:8px;white-space:nowrap}.ss22-product-grid{gap:22px 10px}.ss22-product-grid .product-info h3{font-size:11px}.ss22-featured-section{padding-top:45px;padding-bottom:50px}.ss22-bottom-cta{padding-top:30px;padding-bottom:30px}.ss22-bottom-cta img{width:70px}.ss22-bottom-cta h2{font-size:15px}.site-header .nav-wrap{height:64px}}

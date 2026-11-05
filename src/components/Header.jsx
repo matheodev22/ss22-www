@@ -7,7 +7,7 @@ export default function Header() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   return <header className="site-header">
-    <div className="topline">SS22.WWW · INDUMENTARIA SELECCIONADA · ENVÍOS A TODO EL PAÍS</div>
+    <div className="topline">ENVÍOS A TODO EL PAÍS · NUEVAS PRENDAS DISPONIBLES · SS22.WWW</div>
     <div className="nav-wrap container">
       <button className="icon-button mobile-menu" onClick={() => setOpen(!open)} aria-label="Abrir menú">{open ? <X/> : <Menu/>}</button>
       <Link to="/" className="brand" aria-label="SS22.WWW inicio"><img className="brand-logo" src="/ss22-logo-original.png" alt="SS22.WWW"/></Link>
