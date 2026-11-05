@@ -162,3 +162,132 @@
   .product-image img { transition: none; }
   html { scroll-behavior: auto; }
 }
+
+
+/* SS22 / Editorial home direction */
+.home-editorial { background: #f4f3ef; }
+.home-editorial .hero {
+  display: block;
+  min-height: 0;
+  padding: 22px clamp(24px, 4.2vw, 62px) 20px;
+  margin-top: 0;
+  background: #111;
+  color: #f5f4f0;
+  border-radius: 0;
+  overflow: hidden;
+}
+.home-editorial .hero-meta,
+.home-editorial .hero-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  color: #858585;
+  font-size: 8px;
+  letter-spacing: 1.65px;
+  font-weight: 600;
+}
+.home-editorial .hero-meta { padding-bottom: 18px; border-bottom: 1px solid #353535; }
+.home-editorial .hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 76px);
+  padding: clamp(34px, 5vw, 68px) 0;
+}
+.home-editorial .hero-copy { min-width: 0; }
+.home-editorial .hero-copy > .eyebrow { max-width: 390px; color: #999; line-height: 1.7; font-size: 8px; }
+.home-editorial .hero h1 {
+  margin: 22px 0 26px;
+  font: 600 clamp(62px, 8.2vw, 118px)/.79 'Space Grotesk', sans-serif;
+  letter-spacing: -.095em;
+  color: #f4f3ef;
+}
+.home-editorial .hero h1 em { color: #777; font-style: normal; }
+.home-editorial .hero-period { color: #777; }
+.hero-copy-bottom { display: flex; align-items: end; justify-content: space-between; gap: 20px; max-width: 570px; }
+.home-editorial .hero-description { max-width: 230px; margin: 0; color: #aaa; font-size: 11px; line-height: 1.8; }
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 18px; padding: 13px 0;
+  border-bottom: 1px solid #777; color: #f5f4f0; white-space: nowrap;
+  font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
+  transition: gap .2s, color .2s;
+}
+.hero-cta:hover { gap: 25px; color: #bbb; }
+.home-editorial .hero-art {
+  position: relative; width: 100%; max-width: none; height: auto;
+  aspect-ratio: 16 / 10; max-height: none; margin: 0;
+  justify-self: stretch; overflow: hidden; background: #242424;
+  outline: 1px solid #353535; outline-offset: 7px;
+}
+.home-editorial .hero-art video {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  object-position: center; filter: grayscale(100%) brightness(.58) contrast(1.08);
+  opacity: .95; background: #111;
+}
+.hero-video-shade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,.28), transparent 32%, transparent 60%, rgba(0,0,0,.48));
+}
+.hero-video-logo {
+  position: absolute; width: clamp(145px, 23vw, 280px); height: auto;
+  max-height: 54%; object-fit: contain; left: 50%; top: 50%;
+  transform: translate(-50%, -50%); filter: invert(1); mix-blend-mode: screen;
+  opacity: .94;
+}
+.hero-video-top, .hero-video-bottom {
+  position: absolute; left: 16px; right: 16px; z-index: 2;
+  display: flex; justify-content: space-between; gap: 12px;
+  color: rgba(255,255,255,.78); font-size: 7px; letter-spacing: 1.5px;
+  font-weight: 600; text-shadow: 0 1px 8px #000;
+}
+.hero-video-top { top: 15px; }
+.hero-video-bottom { bottom: 15px; }
+.home-editorial .hero-footer { padding-top: 17px; border-top: 1px solid #353535; }
+.hero-scroll { display: inline-flex; align-items: center; gap: 7px; color: #bbb; }
+.home-products { padding-top: 82px; padding-bottom: 88px; }
+.home-products .section-heading { margin-bottom: 30px; }
+.home-products .section-heading h2 { font-size: clamp(32px, 4.3vw, 52px); letter-spacing: -.065em; }
+.home-products .eyebrow { letter-spacing: 1.7px; }
+.home-products .text-link { font-size: 9px; letter-spacing: .8px; }
+.home-editorial .how-section { background: #deddd8; color: #151515; }
+.home-editorial .how-section .eyebrow.light { color: #777; }
+.home-editorial .how-steps p { border-color: #c4c3bd; }
+.home-editorial .how-steps b { color: #555; }
+.home-editorial .how-steps span { color: #444; }
+.home-editorial .how-section h2 em { color: #888; }
+.home-editorial .newsletter { padding-top: 86px; }
+.brand-logo { display: block; width: 112px; height: 55px; object-fit: contain; }
+.footer-logo { width: 112px; height: 58px; object-fit: contain; filter: invert(1); mix-blend-mode: screen; }
+
+@media (max-width: 800px) {
+  .home-editorial .hero { width: 100%; margin: 0; padding: 18px 22px 16px; }
+  .home-editorial .hero-layout { grid-template-columns: 1fr; gap: 30px; padding: 38px 0 35px; }
+  .home-editorial .hero h1 { font-size: clamp(64px, 13vw, 94px); margin: 18px 0 22px; }
+  .hero-copy-bottom { max-width: 100%; }
+  .home-editorial .hero-description { max-width: 270px; }
+  .home-editorial .hero-art { width: 100%; max-width: 590px; aspect-ratio: 16 / 9; justify-self: center; }
+  .hero-video-logo { width: clamp(145px, 31vw, 230px); }
+  .home-editorial .hero-footer { font-size: 7px; letter-spacing: 1px; }
+  .home-products { padding-top: 58px; padding-bottom: 60px; }
+}
+@media (max-width: 480px) {
+  .home-editorial .hero { padding: 15px 18px 14px; }
+  .home-editorial .hero-meta { font-size: 6px; letter-spacing: 1px; padding-bottom: 13px; }
+  .home-editorial .hero-layout { gap: 27px; padding: 34px 0 28px; }
+  .home-editorial .hero-copy > .eyebrow { font-size: 7px; letter-spacing: 1px; }
+  .home-editorial .hero h1 { font-size: clamp(57px, 15.5vw, 76px); line-height: .82; margin: 17px 0 21px; }
+  .hero-copy-bottom { align-items: center; gap: 12px; }
+  .home-editorial .hero-description { max-width: 48%; font-size: 10px; line-height: 1.6; }
+  .hero-cta { gap: 7px; font-size: 7px; letter-spacing: .7px; }
+  .home-editorial .hero-art { width: 100%; aspect-ratio: 16 / 9; outline-offset: 4px; }
+  .hero-video-top, .hero-video-bottom { left: 10px; right: 10px; font-size: 6px; letter-spacing: .9px; }
+  .hero-video-top { top: 9px; }
+  .hero-video-bottom { bottom: 9px; }
+  .hero-video-logo { width: 42%; }
+  .home-editorial .hero-footer { font-size: 6px; letter-spacing: .65px; gap: 6px; }
+  .home-editorial .hero-footer > span:first-child { max-width: 34%; }
+  .home-editorial .hero-footer > span:last-child { max-width: 20%; text-align: right; }
+  .home-products { padding-top: 48px; padding-bottom: 48px; }
+  .home-products .section-heading h2 { font-size: 29px; }
+}
