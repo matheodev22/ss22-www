@@ -26,16 +26,16 @@ export default async function handler(req, res) {
 
     const { items, customer } = req.body || {};
     if (!Array.isArray(items) || !items.length) return res.status(400).json({ error: 'El carrito está vacío.' });
-    for (const field of ['name', 'phone', 'address', 'city']) {
+    for (const field of ['name', 'phone', 'address', 'city', 'postal_code']) {
       if (!customer?.[field]?.trim()) return res.status(400).json({ error: 'Completá todos los datos de entrega.' });
     }
 
     const ids = [...new Set(items.map(item => item.product_id).filter(id => typeof id === 'string' && !id.startsWith('demo-')))];
     if (ids.length === 0 || items.some(item => typeof item.product_id !== 'string' || item.product_id.startsWith('demo-'))) return res.status(400).json({ error: 'Hay productos de demostración. Cargá productos reales en el administrador antes de vender.' });
-    const { data: products, error: productsError } = await supabase.from('products').select('id,name,price,active').in('id', ids);
+    const { data: products, error: productsError } = await supabase.from('products').select('id,name,price,active,stock_status').in('id', ids);
     if (productsError) throw productsError;
-    if (!products || products.length !== ids.length || products.some(product => !product.active)) {
-      return res.status(400).json({ error: 'Uno de los productos ya no está disponible. Actualizá tu carrito.' });
+    if (!products || products.length !== ids.length || products.some(product => !product.active || product.stock_status === 'sold_out')) {
+      return res.status(400).json({ error: 'Una de las prendas está agotada o ya no está disponible. Actualizá tu carrito.' });
     }
 
     const productMap = new Map(products.map(product => [product.id, product]));
@@ -66,6 +66,9 @@ export default async function handler(req, res) {
       customer_phone: customer.phone.trim(),
       shipping_address: customer.address.trim(),
       shipping_city: customer.city.trim(),
+      shipping_postal_code: customer.postal_code.trim(),
+      shipping_method: customer.shipping_method === 'branch' ? 'branch' : 'home',
+      shipping_amount: null,
       customer_notes: customer.notes?.trim() || '',
     }).select('id,total_amount').single();
     if (orderError) throw orderError;

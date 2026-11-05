@@ -16,3 +16,36 @@
 .transfer-detail{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid #d4d4d0;font-size:12px}
 .transfer-detail strong{text-align:right;overflow-wrap:anywhere}
 @media(max-width:700px){.transfer-detail{align-items:flex-start;flex-direction:column;gap:5px}.transfer-card{padding:20px}.checkout-form{padding:18px}}
+
+/* Ajustes SS22: contenido visual, medios y administración */
+.brand{display:inline-flex;align-items:baseline;gap:2px}.brand-mark{font-weight:700;letter-spacing:-2px}.brand-sub{font-weight:400;color:#858585}
+.hero-art img,.hero-art video{width:100%;height:100%;object-fit:cover;filter:grayscale(100%);opacity:.9}.hero-video{display:block}
+.hero h1{letter-spacing:-.075em}.hero{border-radius:2px}
+.admin-form textarea{border:1px solid #d0d0cc;background:transparent;padding:13px;font:inherit;font-size:12px;min-height:90px;resize:vertical}
+.admin-form .media-picker{grid-column:1/-1;padding:18px;border:1px dashed #aaa;background:#f7f7f5}
+.admin-form .media-picker input{border:0;padding:8px 0}
+.admin-form .media-picker small{font-size:10px;color:#777;font-weight:400}
+.admin-form .check-admin{display:flex;align-items:center;gap:10px}
+.admin-form .check-admin input{width:16px;height:16px}
+.selected-files{grid-column:1/-1;font-size:11px;color:#666;overflow-wrap:anywhere}
+.admin-preview img{width:110px;height:130px;object-fit:cover}
+.admin-product-name{display:flex;align-items:center;gap:13px}.admin-product-name img{width:48px;height:58px;object-fit:cover}.admin-product-name small{display:block;color:#777;margin-top:5px}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+.admin-order-card,.customer-order-card{border:1px solid #dededb;padding:20px;margin:12px 0;display:grid;gap:17px}
+.admin-order-card>div:first-child{display:grid;gap:6px;font-size:12px}.admin-order-card span,.customer-order-card small{color:#777;font-size:11px}
+.admin-order-controls{display:flex;gap:18px;flex-wrap:wrap}.admin-order-controls label{display:grid;gap:7px;font-size:10px;font-weight:700}.admin-order-controls input,.admin-order-controls select{padding:10px;border:1px solid #ccc;background:transparent;min-width:170px}
+.customer-order-head{display:flex;justify-content:space-between;gap:20px;align-items:center}.customer-order-head h3{font:600 19px 'Space Grotesk';margin:4px 0}.customer-order-head>strong{font-size:15px}
+.order-costs{display:flex;gap:30px;flex-wrap:wrap;font-size:12px}.order-costs span{display:flex;gap:10px}.transfer-card-mini{background:#efefeb;padding:17px;display:grid;gap:9px;font-size:12px}
+.shipping-choice{border:1px solid #d0d0cc;padding:14px;display:grid;gap:12px}.shipping-choice legend{font-size:11px;font-weight:700;padding:0 6px}.shipping-choice label{display:flex;align-items:center;gap:9px;font-weight:400}
+.media-thumbs{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.media-thumbs button{width:64px;height:70px;padding:3px;border:1px solid #ccc;background:transparent}.media-thumbs button.selected{border:2px solid #111}.media-thumbs img{width:100%;height:100%;object-fit:cover}.media-thumbs .video-thumb{width:auto;padding:8px 13px;font-size:10px}
+.detail-image video{width:100%;height:100%;object-fit:contain;background:#111}
+.empty-hint{font-size:12px;color:#777}.empty-media{display:grid;place-items:center;height:100%;font:700 28px 'Space Grotesk';color:#999}
+@media(max-width:700px){.admin-order-controls{display:grid}.customer-order-head{align-items:flex-start;flex-direction:column}.admin-row{align-items:flex-start}.admin-actions{justify-content:flex-end}.admin-form .media-picker{grid-column:auto}}
+
+.brand-logo{display:block;width:142px;height:auto;max-height:42px;object-fit:contain}
+
+
+/* Identidad SS22, disponibilidad y administración */
+.brand-logo{display:block;width:112px;height:58px;object-fit:contain;mix-blend-mode:multiply}.footer-logo{display:block;width:150px;height:76px;object-fit:contain;filter:invert(1);mix-blend-mode:screen}.hero-video{width:100%;height:100%;object-fit:cover}.admin-preview-list{display:flex;gap:12px;flex-wrap:wrap;grid-column:1/-1}.admin-preview-list img,.admin-preview-list video{width:110px;height:135px;object-fit:cover;background:#ddd}.admin-form select{border:1px solid #d0d0cc;background:transparent;padding:13px;font-size:12px}.stock-alert{display:inline-block;background:#222;color:white;padding:9px 12px;font-size:10px;letter-spacing:1px}.product-card .image-tag{z-index:1}.product-card:has(.image-tag:first-child){} .product-card .image-tag{font-weight:700}.product-card:has(.image-tag) .image-tag{max-width:130px}.product-card .image-tag{background:#f5f5f2}.button:disabled{opacity:.45;cursor:not-allowed}.admin-order-card{border:1px solid #ddd;padding:18px;margin:12px 0;display:grid;grid-template-columns:1fr 1fr;gap:18px}.admin-order-card span{display:block;font-size:11px;color:#777;margin-top:7px}.admin-order-controls{display:grid;gap:12px;align-content:start}.admin-order-controls label{display:grid;gap:6px;font-size:10px}.admin-order-controls input,.admin-order-controls select{padding:10px;border:1px solid #ccc;background:transparent}.admin-product-name{display:flex;align-items:center;gap:12px}.admin-product-name img{width:48px;height:58px;object-fit:cover}.admin-product-name small{display:block;color:#777;margin-top:5px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:700px){.brand-logo{width:92px;height:52px}.admin-order-card{grid-template-columns:1fr}.admin-row{align-items:flex-start}.admin-actions{justify-content:flex-end}}
+
+.tracking-info{font-size:11px;color:#555}.tracking-info a{text-decoration:underline}.admin-order-controls a{width:max-content}
