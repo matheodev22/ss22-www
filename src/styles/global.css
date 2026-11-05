@@ -291,3 +291,71 @@
   .home-products { padding-top: 48px; padding-bottom: 48px; }
   .home-products .section-heading h2 { font-size: 29px; }
 }
+
+
+/* SS22 — retail/editorial direction inspired by modern streetwear stores */
+.home-marquee{overflow:hidden;background:#d9ff43;color:#111;border-bottom:1px solid #111;padding:10px 0;white-space:nowrap}
+.home-marquee-track{display:flex;width:max-content;animation:ss22-marquee 34s linear infinite}
+.home-marquee-track span{font-size:9px;font-weight:800;letter-spacing:1.7px;padding-right:34px}
+.home-marquee-track b{padding:0 20px;font-size:12px}
+@keyframes ss22-marquee{to{transform:translateX(-50%)}}
+.woundz-inspired{background:#f4f3ef}
+.woundz-inspired .hero{background:#111}
+.woundz-inspired .hero h1{font-size:clamp(66px,8.8vw,126px);letter-spacing:-.105em}
+.woundz-inspired .hero-copy>.eyebrow{color:#c1c1bd}
+.woundz-inspired .hero-cta{border:1px solid #f4f3ef;padding:15px 17px;transition:background .2s,color .2s,gap .2s}
+.woundz-inspired .hero-cta:hover{background:#d9ff43;color:#111;border-color:#d9ff43}
+.woundz-inspired .hero-art{outline:0;aspect-ratio:16/11;background:#242424}
+.woundz-inspired .hero-art video{filter:brightness(.68) contrast(1.08);object-fit:cover}
+.woundz-inspired .hero-video-logo{filter:none;mix-blend-mode:normal}
+.service-strip{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #d7d6d0;padding-top:23px;padding-bottom:23px;gap:18px}
+.service-strip>div{display:flex;align-items:center;justify-content:center;gap:12px}
+.service-strip svg{stroke-width:1.4}
+.service-strip span{display:grid;gap:4px}
+.service-strip b{font-size:9px;letter-spacing:1px}
+.service-strip small{font-size:10px;color:#777}
+.category-ribbon{display:flex;justify-content:space-between;align-items:end;gap:30px;padding-top:68px;padding-bottom:25px}
+.category-ribbon h2{font:600 clamp(28px,4vw,43px)/1.05 'Space Grotesk';letter-spacing:-.07em;margin:0}
+.category-ribbon h2 span{color:#999}
+.category-ribbon-links{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.category-ribbon-links a{display:flex;align-items:center;gap:9px;padding:11px 13px;border:1px solid #d2d1ca;font-size:9px;text-transform:uppercase;letter-spacing:.7px;transition:background .2s,color .2s}
+.category-ribbon-links a:hover,.category-ribbon-links .all-category{background:#111;color:#fff;border-color:#111}
+.home-products{padding-top:48px}
+.home-products .product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.home-products .product-image{height:auto;aspect-ratio:3/4;background:#e7e6e1}
+.home-products .product-image img{filter:none}
+.home-products .image-tag{background:#f4f3ef;color:#111;font-size:8px}
+.home-products .quick-arrow{background:#d9ff43;color:#111}
+.home-products .product-info{align-items:start}
+.home-products .product-info h3{font-size:14px}
+.catalog-bottom{display:flex;justify-content:center;margin-top:38px}
+.catalog-button{display:inline-flex;align-items:center;gap:20px;background:#111;color:#fff;padding:16px 22px;font-size:9px;font-weight:700;letter-spacing:1px;transition:background .2s}
+.catalog-button:hover{background:#414141}
+.woundz-inspired .how-section{background:#d9ff43;color:#111}
+.woundz-inspired .how-section .eyebrow.light{color:#555}
+.woundz-inspired .how-steps p{border-color:rgba(0,0,0,.2)}
+.woundz-inspired .how-steps b,.woundz-inspired .how-steps span{color:#222}
+.woundz-inspired .how-section h2 em{color:#666}
+.woundz-inspired .newsletter .button-dark{background:#111}
+@media(max-width:900px){
+ .home-products .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 14px}
+ .category-ribbon{align-items:flex-start;flex-direction:column;gap:18px}
+ .category-ribbon-links{justify-content:flex-start}
+}
+@media(max-width:600px){
+ .home-marquee{padding:8px 0}
+ .home-marquee-track span{font-size:8px}
+ .service-strip{grid-template-columns:1fr;gap:15px;padding-top:20px;padding-bottom:20px}
+ .service-strip>div{justify-content:flex-start}
+ .category-ribbon{padding-top:48px;padding-bottom:18px}
+ .category-ribbon-links{gap:6px}
+ .category-ribbon-links a{padding:9px 10px;font-size:8px}
+ .home-products{padding-top:35px}
+ .home-products .product-grid{gap:23px 11px}
+ .home-products .product-info h3{font-size:12px}
+ .catalog-bottom{margin-top:28px}
+ .woundz-inspired .hero h1{font-size:clamp(49px,13vw,70px)}
+ .woundz-inspired .hero-art{aspect-ratio:4/5}
+ .hero-copy-bottom{align-items:flex-start;flex-direction:column;gap:12px}
+}
+@media(prefers-reduced-motion:reduce){.home-marquee-track{animation:none}}
