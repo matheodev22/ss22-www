@@ -18,7 +18,7 @@ export default function Home() {
         <Link to="/tienda" className="button button-light">Ver colección <ArrowUpRight size={17}/></Link>
       </div>
       <div className="hero-art">
-        {video ? <video className="hero-video" src={./media/nas.mp4} autoPlay muted loop playsInline poster="/brand-cover.svg"/> :
+        {video ? <video className="hero-video" src={video} autoPlay muted loop playsInline poster="/brand-cover.svg"/> :
           <img src="/brand-cover.svg" alt="Colección SS22.WWW"/>}
         <span className="hero-stamp">SS22<br/>WWW</span>
       </div>
