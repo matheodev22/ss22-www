@@ -18,8 +18,15 @@ export default function Home() {
       <div className="campaign-image" style={heroProduct?.image_url ? { backgroundImage: `url("${heroProduct.image_url}")` } : undefined}>
         <div className="campaign-shade" />
         <div className="campaign-copy">
-          <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
-          <h1>Vestite<br/><em>a tu manera.</em></h1>
+  <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
+
+  <img
+    src="/ss22-logo-original.png"
+    alt="SS22.WWW"
+    className="campaign-logo"
+  />
+
+  <h1>Vestite<br/><em>a tu manera.</em></h1>
           <p>Prendas seleccionadas. Nuevos ingresos y piezas para todos los días.</p>
           <Link to="/tienda" className="campaign-button">EXPLORAR TIENDA <ArrowUpRight size={17}/></Link>
         </div>
