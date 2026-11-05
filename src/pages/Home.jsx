@@ -21,7 +21,7 @@ export default function Home() {
   <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
 
   <img
-    src="/ss22-logo-original.png"
+    src="/logo-ss22.png"
     alt="SS22.WWW"
     className="campaign-logo"
   />
