@@ -22,9 +22,9 @@ export default function Orders() {
       const total = Number(order.total_amount || 0) + shipping;
       return <article className="customer-order-card" key={order.id}>
         <div className="customer-order-head"><div><p className="eyebrow">PEDIDO #{order.id.slice(0,8).toUpperCase()}</p><h3>{labels[order.status] || order.status}</h3><small>{new Date(order.created_at).toLocaleDateString("es-AR")}</small></div><strong>{money(total)}</strong></div>
-        <div className="order-costs"><span>Prendas <b>{money(order.total_amount)}</b></span><span>Envío <b>{order.shipping_amount == null ? "A cotizar" : money(shipping)}</b></span></div>
+        <div className="order-costs"><span>Prendas <b>{money(order.total_amount)}</b></span><span>Envío <b>{order.shipping_amount == null ? "A cotizar" : shipping === 0 ? "GRATIS" : money(shipping)}</b></span></div>
         {order.status === "shipping_quoted" && <div className="transfer-card-mini"><b>Envío confirmado. Ya podés realizar la transferencia del total.</b><span>Total a transferir: <strong>{money(total)}</strong></span>{alias && <span>Alias: <strong>{alias}</strong></span>}{holder && <span>Titular: <strong>{holder}</strong></span>}{(!alias || !holder) && <small>Los datos de transferencia serán informados por la tienda.</small>}</div>}
-        <p className="fine-print">Entrega: {order.shipping_method === "branch" ? "Sucursal Correo Argentino" : "A domicilio"} · CP {order.shipping_postal_code || "—"}</p>{order.tracking_number && <p className="tracking-info">Seguimiento: <strong>{order.tracking_number}</strong> · <a href={`https://www.correoargentino.com.ar/formularios/e-commerce?id=${encodeURIComponent(order.tracking_number)}`} target="_blank" rel="noreferrer">Consultar envío</a></p>}
+        <p className="fine-print">Entrega: {order.shipping_method === "branch" ? "Sucursal Correo Argentino" : "A domicilio"} · {order.shipping_zone || "—"} · CP {order.shipping_postal_code || "—"} · 2 a 5 días hábiles desde el despacho</p>{order.tracking_number && <p className="tracking-info">Seguimiento: <strong>{order.tracking_number}</strong> · <a href={`https://www.correoargentino.com.ar/formularios/e-commerce?id=${encodeURIComponent(order.tracking_number)}`} target="_blank" rel="noreferrer">Consultar envío</a></p>}
       </article>;
     })}
   </main>;

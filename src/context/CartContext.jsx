@@ -26,7 +26,7 @@ export function CartProvider({ children }) {
   function removeItem(key) { persist(items.filter(item => item.key !== key)); }
   function clearCart() { persist([]); }
 
-  const total = items.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0);
+  const total = items.reduce((sum, item) => sum + Number(item.product.applied_price ?? item.product.price) * item.quantity, 0);
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
   const value = useMemo(() => ({ items, total, count, addItem, updateQuantity, removeItem, clearCart }), [items, total, count]);
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

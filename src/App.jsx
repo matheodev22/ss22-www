@@ -12,6 +12,7 @@ import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import Admin from "./pages/Admin";
 import Info from "./pages/Info";
+import WhatsAppButton from "./components/WhatsAppButton";
 
 function AppContent() {
   return <><Header/><Routes>
@@ -20,6 +21,6 @@ function AppContent() {
     <Route path="/pedidos" element={<ProtectedRoute><Orders/></ProtectedRoute>}/>
     <Route path="/admin" element={<ProtectedRoute admin><Admin/></ProtectedRoute>}/>
     <Route path="/preguntas" element={<Info/>}/>    <Route path="*" element={<main className="page container empty-state"><h1>Página no encontrada.</h1></main>}/>
-  </Routes><Footer/></>;
+  </Routes><Footer/><WhatsAppButton/></>;
 }
 export default function App() { return <AuthProvider><AppContent/></AuthProvider>; }

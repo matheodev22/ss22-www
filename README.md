@@ -10,14 +10,14 @@ Tienda online de indumentaria con React, Vite, Supabase y Vercel.
 - Panel privado para publicar, editar, ocultar y destacar prendas.
 - Carga múltiple de fotos y videos desde el panel.
 - Compra por transferencia del 100%.
-- Cotización manual de Correo Argentino por código postal, sin API.
+- Cotizador propio de tarifas estimadas por zona, sin API externa.
 - Gestión del costo del envío y estado de cada pedido.
 
 ## Antes de publicar
 
 1. Instalá dependencias con `npm install`.
 2. Copiá `.env.example` a `.env.local` y completá las variables.
-3. Ejecutá `supabase/actualizacion-tienda-ropa.sql` en el SQL Editor de Supabase.
+3. Ejecutá `supabase/actualizacion-tienda-ropa.sql` y después `supabase/promociones-y-envios-ss22.sql` en el SQL Editor de Supabase.
 4. En Vercel cargá las mismas variables de entorno. `VITE_*` son públicas; `SUPABASE_SERVICE_ROLE_KEY` debe quedar privada.
 5. Volvé a desplegar la tienda.
 
@@ -35,13 +35,13 @@ El administrador permite elegir varios archivos desde la computadora. Los archiv
 
 Para mostrar un video en la portada, subilo al bucket `product-media`, copiá su URL pública y pegala en `VITE_HOME_VIDEO_URL` en Vercel. Después hacé un nuevo despliegue.
 
-## Cómo funciona el envío sin API
+## Cómo funciona el cotizador sin API externa
 
-1. El comprador carga dirección, código postal y elige domicilio o sucursal.
-2. El pedido aparece en Administración como pendiente de cotización.
-3. La tienda consulta el costo en MiCorreo y carga el importe en el pedido.
-4. El estado pasa a “Envío cotizado” y el comprador ve el total más el alias.
-5. Una vez verificada la transferencia, se actualiza el estado a “Pago confirmado” y se prepara el despacho.
+1. El comprador ingresa su código postal en la página del producto y elige una zona de destino para ver las tarifas estimadas a sucursal y domicilio.
+2. En el checkout elige la zona y modalidad; el precio de envío se suma al subtotal con descuentos.
+3. Si una promoción aplicable incluye envío gratis, el envío se bonifica automáticamente.
+4. El backend vuelve a consultar stock y promociones y calcula los importes antes de crear el pedido.
+5. El pedido queda con el total calculado. Desde administración podés ajustar manualmente el envío si necesitás corregirlo y guardar el seguimiento al despachar.
 
 ## Administrador
 
@@ -61,7 +61,7 @@ npm run build
 npm run preview
 ```
 
-Antes de vender, probá el alta de una prenda, la carga de medios, una compra de prueba, la cotización del envío y el cambio de estado.
+Antes de vender, probá el alta de una prenda, la carga de medios, una compra de prueba, los descuentos, el envío gratis, las tarifas por zona y el cambio de estado.
 
 ## Actualización de SS22.WWW (tienda de ropa)
 
@@ -69,10 +69,29 @@ Antes de vender, probá el alta de una prenda, la carga de medios, una compra de
 2. En Vercel configurá las variables públicas `VITE_TRANSFER_ALIAS=ss22.www` y `VITE_TRANSFER_HOLDER=Matheo Martinez`. También conservá las variables de Supabase que ya usa el proyecto.
 3. Para el video principal, subí un MP4 liviano al almacenamiento público de Supabase (bucket `product-media`) y configurá `VITE_HOME_VIDEO_URL` con su URL pública. Si queda vacío, se muestra la portada estática.
 4. En el panel de administración publicá prendas, elegí varias fotos/videos, editá productos y usá los controles de disponibilidad.
-5. Para los envíos, abrí MiCorreo desde cada pedido, cotizá el paquete con su peso y medidas reales, cargá el importe en el pedido y guardá el número de seguimiento cuando tengas la etiqueta.
+5. Para los envíos, revisá la tarifa estimada que se calculó automáticamente. Si necesitás corregirla, podés ajustar el importe desde el panel y guardar el seguimiento cuando tengas la etiqueta.
 
-### Envíos sin API
+### Envíos sin API externa
 
-La tienda no calcula ni cobra automáticamente el envío. El cliente indica código postal y modalidad; desde administración se abre MiCorreo para cotizar manualmente. Cuando ingresás el costo, el pedido pasa a **Envío cotizado · pendiente de pago** y el cliente ve el total y el alias `ss22.www` a nombre de Matheo Martinez en **Mis pedidos**. Después de confirmar la transferencia, actualizá el estado y, cuando tengas el código, guardá el seguimiento.
+El sitio utiliza las tarifas estimadas de SS22 que se detallan más abajo. El cliente puede verlas desde el producto y el checkout calcula el total final con la modalidad y zona elegidas. El administrador puede ajustar el importe si una operación puntual requiere una corrección y cargar el seguimiento cuando se despacha.
 
-**Importante:** para cotizar en MiCorreo necesitás las medidas y el peso del paquete ya preparado. No se estiman automáticamente porque dependen del embalaje real.
+**Importante:** estas tarifas son estimaciones comerciales definidas por SS22, no cotizaciones oficiales de Correo Argentino. El plazo de 2 a 5 días hábiles se cuenta desde el despacho.
+
+
+## Promociones y cotizador de envío SS22
+
+Ejecutá también `supabase/promociones-y-envios-ss22.sql` en Supabase SQL Editor. Crea la tabla de promociones con lectura pública solo de promociones activas y escritura exclusiva de administradores, además de guardar la zona de envío en los pedidos.
+
+Desde `/admin` podés crear promociones para toda la tienda, una categoría o un producto. Cada promoción admite porcentaje de descuento, envío gratis o ambos. El backend vuelve a validar el stock y las promociones antes de registrar la compra.
+
+### Tarifas estimadas de SS22
+
+| Zona | Sucursal | Domicilio |
+|---|---:|---:|
+| AMBA | $9.300 | $14.800 |
+| Buenos Aires interior | $9.550 | $15.100 |
+| Centro | $9.850 | $15.450 |
+| Norte | $9.950 | $15.600 |
+| Patagonia | $10.100 | $15.800 |
+
+Plazo estimado: 2 a 5 días hábiles desde el despacho. Son valores comerciales estimados de SS22, no una cotización oficial de Correo Argentino. Se muestran en el detalle del producto y se calculan nuevamente en checkout.

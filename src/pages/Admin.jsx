@@ -4,11 +4,15 @@ import { money } from "../lib/format";
 
 const statuses = ["pending_payment", "shipping_quoted", "paid", "ordered", "in_transit", "arrived", "ready", "completed", "cancelled"];
 const statusLabels = { pending_payment: "Pendiente de cotización", shipping_quoted: "Envío cotizado · pendiente de pago", paid: "Pago confirmado", ordered: "Preparando pedido", in_transit: "En camino", arrived: "En sucursal", ready: "Listo para retirar", completed: "Entregado", cancelled: "Cancelado" };
+const emptyPromotion = { name: "", target_type: "all", target_value: "", discount_percent: 10, free_shipping: false, active: true };
 const emptyProduct = { name: "", category: "Remeras", price: "", description: "", image_url: "", sizes: "S,M,L,XL", colors: "Negro,Blanco", featured: false, active: true, stock_status: "available", media_urls: [], video_url: "" };
 
 export default function Admin() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [promotions, setPromotions] = useState([]);
+  const [promotion, setPromotion] = useState(emptyPromotion);
+  const [editingPromotionId, setEditingPromotionId] = useState(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [product, setProduct] = useState(emptyProduct);
@@ -16,13 +20,15 @@ export default function Admin() {
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
   async function refresh() {
-    const [p, o] = await Promise.all([
+    const [p, o, promos] = await Promise.all([
       supabase.from("products").select("*").order("created_at", { ascending: false }),
-      supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false })
+      supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
+      supabase.from("store_promotions").select("*").order("created_at", { ascending: false })
     ]);
-    if (p.error || o.error) setError(p.error?.message || o.error?.message);
-    setProducts(p.data || []); setOrders(o.data || []);
+    if (p.error || o.error || promos.error) setError(p.error?.message || o.error?.message || promos.error?.message);
+    setProducts(p.data || []); setOrders(o.data || []); setPromotions(promos.data || []);
   }
+
   useEffect(() => { refresh(); }, []);
 
   async function uploadMedia() {
@@ -72,6 +78,48 @@ export default function Admin() {
     setFiles([]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+  async function savePromotion(e) {
+    e.preventDefault(); setError(""); setNotice("");
+    const payload = {
+      name: promotion.name.trim() || "Promoción SS22",
+      target_type: promotion.target_type,
+      target_value: promotion.target_type === "all" ? "" : String(promotion.target_value || ""),
+      discount_percent: Math.min(90, Math.max(0, Number(promotion.discount_percent) || 0)),
+      free_shipping: Boolean(promotion.free_shipping),
+      active: Boolean(promotion.active)
+    };
+    if (payload.discount_percent === 0 && !payload.free_shipping) {
+      setError("Activá un descuento, envío gratis o ambas opciones."); return;
+    }
+    if (payload.target_type !== "all" && !payload.target_value) {
+      setError("Elegí la categoría o la prenda a la que se aplica la promoción."); return;
+    }
+    const result = editingPromotionId
+      ? await supabase.from("store_promotions").update(payload).eq("id", editingPromotionId)
+      : await supabase.from("store_promotions").insert(payload);
+    if (result.error) { setError(result.error.message); return; }
+    setPromotion(emptyPromotion); setEditingPromotionId(null);
+    setNotice(editingPromotionId ? "Promoción actualizada." : "Promoción creada.");
+    await refresh();
+  }
+
+  function editPromotion(p) {
+    setEditingPromotionId(p.id);
+    setPromotion({ ...emptyPromotion, ...p });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function togglePromotion(id, active) {
+    const { error } = await supabase.from("store_promotions").update({ active: !active }).eq("id", id);
+    if (error) setError(error.message); else { setNotice("Estado de la promoción actualizado."); refresh(); }
+  }
+
+  async function deletePromotion(id) {
+    if (!window.confirm("¿Eliminar esta promoción?")) return;
+    const { error } = await supabase.from("store_promotions").delete().eq("id", id);
+    if (error) setError(error.message); else { setNotice("Promoción eliminada."); refresh(); }
+  }
+
   async function updateStatus(id, status) {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
     if (error) setError(error.message); else refresh();
@@ -117,13 +165,32 @@ export default function Admin() {
         {editingId && <button type="button" className="button button-outline" onClick={() => { setEditingId(null); setProduct(emptyProduct); setFiles([]); }}>Cancelar edición</button>}
       </form>
     </section>
+    <section className="admin-section promotions-admin">
+      <h2>Descuentos y envíos gratis</h2>
+      <p className="admin-help">Creá promociones para toda la tienda, una categoría o una prenda puntual. Podés combinar descuento y envío gratis.</p>
+      <form className="admin-form" onSubmit={savePromotion}>
+        <label>Nombre de la promoción<input required value={promotion.name} onChange={e => setPromotion({ ...promotion, name: e.target.value })} placeholder="Ej. Sale de temporada"/></label>
+        <label>Aplicar a<select value={promotion.target_type} onChange={e => setPromotion({ ...promotion, target_type: e.target.value, target_value: "" })}><option value="all">Toda la tienda</option><option value="category">Una categoría / grupo</option><option value="product">Una prenda</option></select></label>
+        {promotion.target_type === "category" && <label>Categoría<select required value={promotion.target_value} onChange={e => setPromotion({ ...promotion, target_value: e.target.value })}><option value="">Elegir categoría</option>{[...new Set(products.map(p => p.category).filter(Boolean))].map(c => <option key={c} value={c}>{c}</option>)}</select></label>}
+        {promotion.target_type === "product" && <label>Prenda<select required value={promotion.target_value} onChange={e => setPromotion({ ...promotion, target_value: e.target.value })}><option value="">Elegir prenda</option>{products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}
+        <label>Descuento (%)<input type="number" min="0" max="90" value={promotion.discount_percent} onChange={e => setPromotion({ ...promotion, discount_percent: e.target.value })}/></label>
+        <label className="check-admin"><input type="checkbox" checked={Boolean(promotion.free_shipping)} onChange={e => setPromotion({ ...promotion, free_shipping: e.target.checked })}/> Activar envío gratis</label>
+        <label className="check-admin"><input type="checkbox" checked={Boolean(promotion.active)} onChange={e => setPromotion({ ...promotion, active: e.target.checked })}/> Promoción activa</label>
+        <button className="button button-dark">{editingPromotionId ? "Guardar promoción" : "Crear promoción"}</button>
+        {editingPromotionId && <button type="button" className="button button-outline" onClick={() => { setEditingPromotionId(null); setPromotion(emptyPromotion); }}>Cancelar edición</button>}
+      </form>
+      <div className="promotion-list">
+        {promotions.map(p => <article className="admin-row promotion-row" key={p.id}><div><b>{p.name}</b><small>{p.target_type === "all" ? "Toda la tienda" : p.target_type === "category" ? `Categoría: ${p.target_value}` : `Prenda: ${products.find(x => x.id === p.target_value)?.name || "Producto"}`}</small><small>{p.discount_percent > 0 ? `${p.discount_percent}% de descuento` : ""}{p.discount_percent > 0 && p.free_shipping ? " · " : ""}{p.free_shipping ? "Envío gratis" : ""} · {p.active ? "Activa" : "Pausada"}</small></div><div className="admin-actions"><button className="button button-outline small" onClick={() => editPromotion(p)}>Editar</button><button className="button button-outline small" onClick={() => togglePromotion(p.id, p.active)}>{p.active ? "Pausar" : "Activar"}</button><button className="button button-outline small" onClick={() => deletePromotion(p.id)}>Eliminar</button></div></article>)}
+        {!promotions.length && <p className="empty-hint">Todavía no hay promociones creadas.</p>}
+      </div>
+    </section>
     <section className="admin-section"><h2>Prendas publicadas ({products.length})</h2>
       {products.map(p => <div className="admin-row" key={p.id}><div className="admin-product-name">{p.image_url && <img src={p.image_url} alt=""/>}<span><b>{p.name}</b><small>{money(p.price)} · {p.category} · {p.stock_status === "sold_out" ? "AGOTADO" : "DISPONIBLE"} · {p.active ? "Visible" : "Oculta"}</small></span></div><div className="admin-actions"><button className="button button-outline small" onClick={() => editProduct(p)}>Editar</button><button className="button button-outline small" onClick={() => toggleStock(p.id, p.stock_status)}>{p.stock_status === "sold_out" ? "Marcar disponible" : "Marcar agotada"}</button><button className="button button-outline small" onClick={() => toggleProduct(p.id, p.active)}>{p.active ? "Ocultar" : "Mostrar"}</button></div></div>)}
     </section>
     <section className="admin-section"><h2>Pedidos y envíos ({orders.length})</h2>
       {orders.map(o => <article className="admin-order-card" key={o.id}>
-        <div><b>Pedido #{o.id.slice(0,8).toUpperCase()}</b><span>{o.customer_name} · {o.customer_phone}</span><span>{o.shipping_address}, {o.shipping_city} · CP {o.shipping_postal_code || "Sin CP"}</span><span>Entrega: {o.shipping_method === "branch" ? "Sucursal Correo Argentino" : "Domicilio"}</span><span>Productos: {money(o.total_amount)} · Envío: {o.shipping_amount == null ? "A cotizar" : money(o.shipping_amount)}</span>{o.order_items?.map((item, i) => <span key={item.id || i}>{item.quantity} × {item.name} · Talle {item.size || "—"} · {item.color || "—"}</span>)}</div>
-        <div className="admin-order-controls"><a className="button button-outline small" href="https://micorreo.correoargentino.com.ar/" target="_blank" rel="noreferrer">Cotizar en Correo Argentino ↗</a><label>Costo de envío (ARS)<input type="number" min="0" step="1" defaultValue={o.shipping_amount ?? ""} placeholder="Cotizar" onBlur={e => { if (e.target.value !== String(o.shipping_amount ?? "")) updateShipping(o.id, e.target.value); }}/></label>
+        <div><b>Pedido #{o.id.slice(0,8).toUpperCase()}</b><span>{o.customer_name} · {o.customer_phone}</span><span>{o.shipping_address}, {o.shipping_city} · CP {o.shipping_postal_code || "Sin CP"}</span><span>Entrega: {o.shipping_method === "branch" ? "Sucursal Correo Argentino" : "Domicilio"} · Zona: {o.shipping_zone || "AMBA"}</span><span>Productos: {money(o.total_amount)} · Envío: {o.shipping_amount == null ? "A cotizar" : Number(o.shipping_amount) === 0 ? "GRATIS" : money(o.shipping_amount)}</span>{o.order_items?.map((item, i) => <span key={item.id || i}>{item.quantity} × {item.name} · Talle {item.size || "—"} · {item.color || "—"}</span>)}</div>
+        <div className="admin-order-controls"><a className="button button-outline small" href="https://micorreo.correoargentino.com.ar/" target="_blank" rel="noreferrer">Consultar tarifa oficial ↗</a><label>Ajustar envío (ARS)<input type="number" min="0" step="1" defaultValue={o.shipping_amount ?? ""} placeholder="Cotizar" onBlur={e => { if (e.target.value !== String(o.shipping_amount ?? "")) updateShipping(o.id, e.target.value); }}/></label>
         <label>Número de seguimiento<input defaultValue={o.tracking_number || ""} placeholder="Pegá el código de Correo Argentino" onBlur={e => { if (e.target.value !== (o.tracking_number || "")) updateTracking(o.id, e.target.value); }}/></label><label>Estado<select value={o.status} onChange={e => updateStatus(o.id, e.target.value)}>{statuses.map(s => <option key={s} value={s}>{statusLabels[s]}</option>)}</select></label></div>
       </article>)}
     </section>

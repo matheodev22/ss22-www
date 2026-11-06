@@ -3,10 +3,12 @@ import { ArrowUpRight, Truck, ShieldCheck, CreditCard } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { getProducts } from "../lib/products";
 import ProductCard from "../components/ProductCard";
+import { getActivePromotions } from "../lib/promotions";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
-  useEffect(() => { getProducts().then(setProducts).catch(console.error); }, []);
+  const [promotions, setPromotions] = useState([]);
+  useEffect(() => { getProducts().then(setProducts).catch(console.error); getActivePromotions().then(setPromotions).catch(() => setPromotions([])); }, []);
   const latest = products.slice(0, 4);
   const featured = useMemo(() => products.filter(p => p.featured).slice(0, 4), [products]);
   const categories = useMemo(() => [...new Set(products.map(p => p.category).filter(Boolean))].slice(0, 5), [products]);
@@ -39,10 +41,10 @@ export default function Home() {
 
     <section className="store-products container">
       <div className="store-section-head"><div><span className="store-overline">LO ÚLTIMO EN SS22</span><h2>Nuevos ingresos</h2></div><Link to="/tienda">VER CATÁLOGO <ArrowUpRight size={15}/></Link></div>
-      {latest.length ? <div className="product-grid store-product-grid">{latest.map(p => <ProductCard key={p.id} product={p}/>)}</div> : <p className="store-empty">Próximamente vas a encontrar nuevas prendas acá.</p>}
+      {latest.length ? <div className="product-marquee"><div className="product-marquee-track">{[...latest, ...latest].map((p, i) => <div className="product-marquee-item" key={`${p.id}-${i}`}><ProductCard product={p} promotions={promotions}/></div>)}</div></div> : <p className="store-empty">Próximamente vas a encontrar nuevas prendas acá.</p>}
     </section>
 
-    {featured.length > 0 && <section className="store-featured"><div className="container store-products"><div className="store-section-head"><div><span className="store-overline">SELECCIÓN DE LA CASA</span><h2>Novedades</h2></div><Link to="/tienda">DESCUBRIR MÁS <ArrowUpRight size={15}/></Link></div><div className="product-grid store-product-grid">{featured.map(p => <ProductCard key={p.id} product={p}/>)}</div></div></section>}
+    {featured.length > 0 && <section className="store-featured"><div className="container store-products"><div className="store-section-head"><div><span className="store-overline">SELECCIÓN DE LA CASA</span><h2>Novedades</h2></div><Link to="/tienda">DESCUBRIR MÁS <ArrowUpRight size={15}/></Link></div><div className="product-grid store-product-grid">{featured.map(p => <ProductCard key={p.id} product={p} promotions={promotions}/>)}</div></div></section>}
 
     <section className="store-signoff container"><img src="/ss22-logo-original.png" alt="SS22.WWW"/><div><span>SS22.WWW · INDUMENTARIA</span><h2>Encontrá eso que estabas buscando.</h2></div><Link to="/tienda" aria-label="Ver tienda"><ArrowUpRight/></Link></section>
   </main>;
