@@ -18,7 +18,7 @@ export default function Home() {
         <img className="campaign-spinning-logo" src="/ss22-logo-original.png" alt="SS22.WWW" />
         <div className="campaign-copy">
           <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
-          <h1>Vestite<br/><em>a tu manera.</em></h1>
+          <h1>Vestite<br/><em>Prendas seleccionadas</em></h1>
           <p>Prendas seleccionadas. Nuevos ingresos y piezas para todos los días.</p>
           <Link to="/tienda" className="campaign-button">EXPLORAR TIENDA <ArrowUpRight size={17}/></Link>
         </div>
@@ -42,7 +42,7 @@ export default function Home() {
       {latest.length ? <div className="product-grid store-product-grid">{latest.map(p => <ProductCard key={p.id} product={p}/>)}</div> : <p className="store-empty">Próximamente vas a encontrar nuevas prendas acá.</p>}
     </section>
 
-    {featured.length > 0 && <section className="store-featured"><div className="container store-products"><div className="store-section-head"><div><span className="store-overline">SELECCIÓN DE LA CASA</span><h2>Destacados</h2></div><Link to="/tienda">DESCUBRIR MÁS <ArrowUpRight size={15}/></Link></div><div className="product-grid store-product-grid">{featured.map(p => <ProductCard key={p.id} product={p}/>)}</div></div></section>}
+    {featured.length > 0 && <section className="store-featured"><div className="container store-products"><div className="store-section-head"><div><span className="store-overline">SELECCIÓN DE LA CASA</span><h2>Novedades</h2></div><Link to="/tienda">DESCUBRIR MÁS <ArrowUpRight size={15}/></Link></div><div className="product-grid store-product-grid">{featured.map(p => <ProductCard key={p.id} product={p}/>)}</div></div></section>}
 
     <section className="store-signoff container"><img src="/ss22-logo-original.png" alt="SS22.WWW"/><div><span>SS22.WWW · INDUMENTARIA</span><h2>Encontrá eso que estabas buscando.</h2></div><Link to="/tienda" aria-label="Ver tienda"><ArrowUpRight/></Link></section>
   </main>;

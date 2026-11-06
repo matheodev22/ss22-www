@@ -428,10 +428,10 @@ body{background:#fff;color:#111}
 .campaign-image{height:min(690px,62vw);min-height:460px;position:relative;overflow:hidden;background:#d8d8d8 url('/brand-cover.svg') center/cover no-repeat;color:#fff;background-position:center 42%;background-size:cover}
 .campaign-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.15) 62%,rgba(0,0,0,.08))}
 .campaign-copy{position:absolute;left:8%;top:50%;transform:translateY(-50%);max-width:560px}
-.campaign-kicker{font-size:9px;letter-spacing:2px;color:#eee}
+.campaign-kicker{DISPLAY:NONE}
 .campaign-copy h1{font:600 clamp(52px,8vw,108px)/.9 'Space Grotesk',sans-serif;letter-spacing:-.075em;margin:24px 0 18px;color:#fff}
-.campaign-copy h1 em{font-style:normal;color:#ddd}
-.campaign-copy p{max-width:350px;font-size:13px;line-height:1.7;color:#eee;margin:0 0 28px}
+.campaign-copy h1 em{font-style:normal;color:black}
+.campaign-copy p{max-width:350px;font-size:13px;line-height:1.7;color:black;margin:0 0 28px}
 .campaign-button{display:inline-flex;align-items:center;gap:28px;background:#fff;color:#111;padding:16px 19px;font-size:9px;font-weight:700;letter-spacing:1px;transition:.2s}
 .campaign-button:hover{background:#ddd}
 .campaign-index{position:absolute;right:30px;bottom:26px;font-size:8px;letter-spacing:1.5px;color:#eee}
