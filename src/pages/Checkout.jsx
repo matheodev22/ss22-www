@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { money } from "../lib/format";
 import { supabase } from "../lib/supabase";
 import { getActivePromotions, getProductOffer, cartHasFreeShipping } from "../lib/promotions";
-import { SHIPPING_RATES, shippingPrice, validatePostalCode } from "../lib/shipping";
+import { shippingPrice, validatePostalCode, getBranchPickupInfo } from "../lib/shipping";
 
 export default function Checkout() {
   const { items, clearCart } = useCart();
@@ -84,11 +84,12 @@ export default function Checkout() {
         <label>Teléfono<input name="phone" autoComplete="tel" required value={form.phone} onChange={change}/></label>
         <label>Dirección y número<input name="address" autoComplete="street-address" required value={form.address} onChange={change}/></label>
         <label>Localidad y provincia<input name="city" autoComplete="address-level2" required value={form.city} onChange={change}/></label>
-        <label>Código postal argentino (CPA)<input name="postal_code" autoComplete="postal-code" required maxLength={8} value={form.postal_code} onChange={change} placeholder="Ej. B1704ABC"/><small>Ingresá el CPA completo. La zona se calcula automáticamente. <a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" rel="noreferrer">Verificar CPA oficial</a>.</small>{form.postal_code && <small className={postal.valid ? "postal-valid" : "postal-invalid"}>{postal.valid ? `Destino detectado: ${SHIPPING_RATES[postal.zone].label}` : postal.message}</small>}</label>
+        <label>Código postal (4 números)<input name="postal_code" autoComplete="postal-code" required maxLength={4} inputMode="numeric" pattern="[0-9]{4}" value={form.postal_code} onChange={e => setForm(current => ({ ...current, postal_code: e.target.value.replace(/\D/g, "").slice(0, 4) }))} placeholder="Ej. 1704"/><small>Ingresá únicamente los 4 números de tu código postal. La tarifa se calcula automáticamente.</small>{form.postal_code && <small className={postal.valid ? "postal-valid" : "postal-invalid"}>{postal.valid ? "Rango postal reconocido. Tarifas calculadas automáticamente." : postal.message}</small>}</label>
         <fieldset className="shipping-choice"><legend>¿Cómo querés recibirlo?</legend>
           <label><input type="radio" name="shipping_method" value="home" checked={form.shipping_method === "home"} onChange={change}/> Envío a domicilio</label>
           <label><input type="radio" name="shipping_method" value="branch" checked={form.shipping_method === "branch"} onChange={change}/> Retiro en sucursal de Correo Argentino</label>
         </fieldset>
+        {form.shipping_method === "branch" && postal.valid && <p className="shipping-branch-info">{getBranchPickupInfo(postal.zone)}</p>}
         <p className="shipping-delivery-note">Plazo estimado: 2 a 5 días hábiles desde el despacho.</p>
         <label>Indicaciones (opcional)<textarea name="notes" value={form.notes} onChange={change} placeholder="Piso, departamento u otra información útil"/></label>
         <div className="payment-method-note"><strong>Pago por transferencia</strong><span>El pedido se registra con el total de prendas y envío. Encontrarás los datos de pago en Mis pedidos.</span></div>
@@ -98,10 +99,10 @@ export default function Checkout() {
       <aside className="summary-card"><p className="eyebrow">TU COMPRA</p>
         {items.map(item => { const offer = getProductOffer(item.product, promotions); return <div key={item.key}><span>{item.product.name} × {item.quantity}{offer.discount ? ` · -${offer.discount}%` : ""}</span><strong>{money(offer.price * item.quantity)}</strong></div>; })}
         <hr/><div><span>Subtotal con descuentos</span><strong>{money(subtotal)}</strong></div>
-        <div><span>Envío {freeShipping ? "(promoción)" : shippingZone ? `· ${SHIPPING_RATES[shippingZone].label}` : "· ingresá tu CPA"}</span><strong>{freeShipping ? "GRATIS" : shipping == null ? "A calcular" : money(shipping)}</strong></div>
+        <div><span>Envío {freeShipping ? "(promoción)" : ""}</span><strong>{freeShipping ? "GRATIS" : shipping == null ? "A calcular" : money(shipping)}</strong></div>
         <div className="checkout-grand-total"><span>Total</span><strong>{money(grandTotal)}</strong></div>
         {freeShipping && <small className="offer-note">¡Tu carrito tiene envío gratis!</small>}
-        <small>Precios estimados de SS22. El CPA debe coincidir con un formato y rango postal argentino reconocido. Entrega estimada: 2 a 5 días hábiles desde el despacho.</small>
+        <small>Precios estimados de SS22. El código postal debe tener 4 números y estar dentro de un rango postal argentino reconocido. Entrega estimada: 2 a 5 días hábiles desde el despacho.</small>
       </aside>
     </div>
   </main>;

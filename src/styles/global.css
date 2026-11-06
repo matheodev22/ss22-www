@@ -677,3 +677,110 @@ body{background:#fff;color:#111}
   .admin-actions{flex-wrap:wrap}
   .transfer-confirmation .transfer-card{padding:20px 16px!important}
 }
+
+
+/* SS22 · portada editorial centrada y cotizador simplificado */
+.campaign-hero { padding: 0 22px 28px; }
+.campaign-image-logo {
+  min-height: 610px;
+  height: min(720px, 70vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 2vw, 22px);
+  padding: 54px 24px 68px;
+  background: linear-gradient(145deg, #fff 0%, #faf9fc 62%, #f0eff6 100%) !important;
+  border: 1px solid #eeedf2;
+  color: #15141a;
+  text-align: center;
+}
+.campaign-image-logo .campaign-spinning-logo {
+  position: relative;
+  display: block;
+  left: auto;
+  top: auto;
+  width: clamp(150px, 20vw, 245px);
+  max-height: 220px;
+  height: auto;
+  object-fit: contain;
+  transform: none;
+  z-index: 1;
+  animation: ss22LogoFloat 7s ease-in-out infinite;
+  filter: drop-shadow(0 12px 18px rgba(36, 28, 55, .07));
+}
+.campaign-image-logo .campaign-copy {
+  position: relative;
+  inset: auto;
+  transform: none;
+  width: min(100%, 620px);
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.campaign-image-logo .campaign-kicker {
+  display: block;
+  color: #77718a;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+}
+.campaign-image-logo .campaign-copy h1 {
+  color: #17151c;
+  font-size: clamp(43px, 6.4vw, 82px);
+  line-height: .94;
+  letter-spacing: -.075em;
+  margin: 13px 0 14px;
+}
+.campaign-image-logo .campaign-copy h1 em { color: #8b829f; }
+.campaign-image-logo .campaign-copy p {
+  color: #686471;
+  max-width: 390px;
+  font-size: 13px;
+  line-height: 1.75;
+  margin: 0 0 23px;
+}
+.campaign-image-logo .campaign-button {
+  background: #25212d;
+  color: #fff;
+  border-radius: 2px;
+  padding: 15px 20px;
+  transition: transform .2s ease, background .2s ease;
+}
+.campaign-image-logo .campaign-button:hover { background: #766b8e; transform: translateY(-2px); }
+.campaign-image-logo .campaign-index { color: #9893a2; right: 25px; bottom: 22px; }
+@keyframes ss22LogoFloat {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+}
+.shipping-cp-confirm { margin: 0; color: #77718a; font-size: 11px; font-weight: 650; }
+.shipping-branch-info {
+  display: block;
+  padding: 11px 12px;
+  border-radius: 4px;
+  background: #f3f1f7;
+  color: #625b70;
+  font-size: 10px;
+  line-height: 1.55;
+}
+.shipping-quote-results button { border-radius: 4px; transition: border-color .2s, background .2s; }
+.shipping-quote-results button.selected { border-color: #8b829f; background: #f8f7fb; box-shadow: inset 0 0 0 1px #8b829f; }
+.shipping-calculator { border-radius: 6px; border-color: #e6e3ec; background: #fdfcff; }
+.shipping-calculator input:focus { outline: 2px solid #d7d1e3; border-color: #8b829f; }
+@media (max-width: 700px) {
+  .campaign-hero { padding: 0 10px 18px; }
+  .campaign-image-logo { min-height: 510px; height: auto; padding: 45px 18px 58px; gap: 13px; }
+  .campaign-image-logo .campaign-spinning-logo { width: clamp(132px, 42vw, 185px); max-height: 170px; }
+  .campaign-image-logo .campaign-copy { width: 100%; }
+  .campaign-image-logo .campaign-copy h1 { font-size: clamp(42px, 12vw, 58px); margin: 10px 0 12px; }
+  .campaign-image-logo .campaign-copy p { max-width: 300px; font-size: 12px; margin-bottom: 19px; }
+  .campaign-image-logo .campaign-index { right: 12px; bottom: 13px; font-size: 7px; }
+  .shipping-calculator { padding: 15px; margin: 20px 0; }
+  .shipping-quote-results button { padding: 13px 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campaign-image-logo .campaign-spinning-logo { animation: none; }
+}

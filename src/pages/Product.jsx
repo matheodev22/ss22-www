@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Minus, ShoppingBag, Truck } from "lucide-react";
 import { getProduct } from "../lib/products";
 import { getActivePromotions, getProductOffer } from "../lib/promotions";
-import { SHIPPING_RATES, shippingPrice } from "../lib/shipping";
+import { shippingPrice, validatePostalCode, getBranchPickupInfo } from "../lib/shipping";
 import { useCart } from "../context/CartContext";
 import { money } from "../lib/format";
 
@@ -12,7 +12,7 @@ export default function Product() {
   const [product, setProduct] = useState(null); const [promotions, setPromotions] = useState([]);
   const [size, setSize] = useState(""); const [color, setColor] = useState(""); const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState(""); const [activeMedia, setActiveMedia] = useState("");
-  const [postalCode, setPostalCode] = useState(""); const [zone, setZone] = useState("amba"); const [shippingMethod, setShippingMethod] = useState("branch");
+  const [postalCode, setPostalCode] = useState(""); const [shippingMethod, setShippingMethod] = useState("branch");
   useEffect(() => {
     getProduct(id).then(p => { setProduct(p); setSize(p?.sizes?.[0] || "Único"); setColor(p?.colors?.[0] || ""); setActiveMedia(p?.image_url || ""); }).catch(e => setError(e.message));
     getActivePromotions().then(setPromotions).catch(() => setPromotions([]));
@@ -20,9 +20,10 @@ export default function Product() {
   if (!product) return <main className="page container">{error || "Cargando prenda..."}</main>;
   const offer = getProductOffer(product, promotions);
   const images = product.media_urls?.length ? product.media_urls : (product.image_url ? [product.image_url] : []);
-  const canQuote = postalCode.trim().length >= 4;
-  const branchPrice = shippingPrice(zone, "branch", offer.freeShipping);
-  const homePrice = shippingPrice(zone, "home", offer.freeShipping);
+  const postal = validatePostalCode(postalCode);
+  const canQuote = postal.valid;
+  const branchPrice = shippingPrice(postal.zone, "branch", offer.freeShipping);
+  const homePrice = shippingPrice(postal.zone, "home", offer.freeShipping);
   return <main className="page container product-detail">
     <button className="back-link" onClick={() => navigate(-1)}><ArrowLeft size={16}/> Volver a la tienda</button>
     <div className="detail-grid"><div>
@@ -39,12 +40,15 @@ export default function Product() {
         <div className="option-group"><strong>Cantidad</strong><div className="quantity-control"><button onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus size={15}/></button><span>{quantity}</span><button onClick={() => setQuantity(Math.min(20, quantity + 1))}><Plus size={15}/></button></div></div>
         <section className="shipping-calculator">
           <div className="shipping-calculator-heading"><Truck size={18}/><div><strong>Calculá tu envío</strong><small>Consultá el costo antes de comprar.</small></div></div>
-          <label>Código postal<input value={postalCode} onChange={e => setPostalCode(e.target.value)} placeholder="Ej. 1704" inputMode="numeric"/></label>
-          <label>Zona de destino<select value={zone} onChange={e => setZone(e.target.value)}>{Object.entries(SHIPPING_RATES).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}</select></label>
-          {canQuote ? <div className="shipping-quote-results">
-            <button type="button" className={shippingMethod === "branch" ? "selected" : ""} onClick={() => setShippingMethod("branch")}><span>Retiro en sucursal<small>2 a 5 días hábiles desde el despacho</small></span><b>{offer.freeShipping ? "GRATIS" : money(branchPrice)}</b></button>
-            <button type="button" className={shippingMethod === "home" ? "selected" : ""} onClick={() => setShippingMethod("home")}><span>Envío a domicilio<small>2 a 5 días hábiles desde el despacho</small></span><b>{offer.freeShipping ? "GRATIS" : money(homePrice)}</b></button>
-          </div> : <small className="shipping-help">Ingresá tu código postal para consultar los valores estimados.</small>}
+          <label>Código postal<input value={postalCode} onChange={e => setPostalCode(e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="Ej. 1704" inputMode="numeric" pattern="[0-9]{4}" maxLength={4}/></label>
+          {canQuote ? <>
+            <p className="shipping-cp-confirm">Presupuestos estimados para el CP {postal.normalized}</p>
+            <div className="shipping-quote-results">
+              <button type="button" className={shippingMethod === "branch" ? "selected" : ""} onClick={() => setShippingMethod("branch")}><span>Retiro en sucursal<small>2 a 5 días hábiles desde el despacho</small></span><b>{offer.freeShipping ? "GRATIS" : money(branchPrice)}</b></button>
+              <button type="button" className={shippingMethod === "home" ? "selected" : ""} onClick={() => setShippingMethod("home")}><span>Envío a domicilio<small>2 a 5 días hábiles desde el despacho</small></span><b>{offer.freeShipping ? "GRATIS" : money(homePrice)}</b></button>
+            </div>
+            <small className="shipping-branch-info">{getBranchPickupInfo(postal.zone)}</small>
+          </> : <small className="shipping-help">{postalCode.length ? postal.message : "Ingresá los 4 números de tu código postal para ver los presupuestos."}</small>}
           {offer.freeShipping && <p className="offer-note">Esta prenda tiene envío gratis.</p>}
         </section>
         <div className="deposit-box"><span>Precio de la prenda × {quantity}</span><strong>{money(offer.price * quantity)}</strong><small>El envío se suma en el checkout según la zona y modalidad elegidas.</small></div>

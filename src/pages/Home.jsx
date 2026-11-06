@@ -20,7 +20,7 @@ export default function Home() {
         <img className="campaign-spinning-logo" src="/ss22-logo-original.png" alt="SS22.WWW" />
         <div className="campaign-copy">
           <span className="campaign-kicker">SS22.WWW · BUENOS AIRES</span>
-          <h1>Vestite<br/><em>Prendas seleccionadas</em></h1>
+          <h1>Vestite<br/><em>a tu manera.</em></h1>
           <p>Prendas seleccionadas. Nuevos ingresos y piezas para todos los días.</p>
           <Link to="/tienda" className="campaign-button">EXPLORAR TIENDA <ArrowUpRight size={17}/></Link>
         </div>
