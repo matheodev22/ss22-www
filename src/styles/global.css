@@ -655,3 +655,25 @@ body{background:#fff;color:#111}
 @media (prefers-reduced-motion: reduce) {
   .campaign-image-logo .campaign-spinning-logo { animation: none; }
 }
+
+/* SS22 checkout: claridad y comodidad en móvil */
+.checkout-form label small{display:block;margin-top:6px;color:#777;font-size:11px;line-height:1.45}
+.checkout-form .postal-valid{color:#247545;font-weight:700}
+.checkout-form .postal-invalid{color:#a12a2a;font-weight:600}
+.transfer-confirmation .transfer-card{max-width:680px;margin-inline:auto}
+.transfer-confirmation .transfer-detail{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.admin-order-card{overflow-wrap:anywhere}
+.admin-order-controls label{min-width:0}
+@media(max-width:700px){
+  .cart-layout{grid-template-columns:1fr!important;gap:18px!important}
+  .checkout-form,.summary-card{width:100%;min-width:0}
+  .checkout-form{padding:20px 16px!important}
+  .checkout-form input,.checkout-form select,.checkout-form textarea{font-size:16px;min-height:46px}
+  .checkout-form .shipping-choice{display:grid;gap:12px}
+  .summary-card{position:static!important;padding:18px 15px!important}
+  .admin-order-card{grid-template-columns:1fr!important;padding:16px!important;gap:14px!important}
+  .admin-order-controls{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}
+  .admin-order-controls input,.admin-order-controls select{width:100%;min-height:44px;font-size:16px}
+  .admin-actions{flex-wrap:wrap}
+  .transfer-confirmation .transfer-card{padding:20px 16px!important}
+}

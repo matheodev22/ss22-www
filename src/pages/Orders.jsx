@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { money } from "../lib/format";
 
-const labels = { pending_payment: "Envío pendiente de cotización", shipping_quoted: "Envío cotizado · pendiente de pago", paid: "Pago confirmado", ordered: "Preparando pedido", in_transit: "En camino", arrived: "En sucursal", ready: "Listo para retirar", completed: "Entregado", cancelled: "Cancelado" };
+const labels = { pending_payment: "Envío pendiente de cotización", shipping_quoted: "Esperando comprobante / pago", paid: "Pago confirmado", ordered: "Preparando pedido", in_transit: "En camino", arrived: "En sucursal", ready: "Listo para retirar", completed: "Entregado", cancelled: "Cancelado" };
 export default function Orders() {
   const { user } = useAuth(); const [orders, setOrders] = useState([]); const [error, setError] = useState("");
   const alias = import.meta.env.VITE_TRANSFER_ALIAS || "ss22.www";

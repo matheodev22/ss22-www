@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { shippingPrice } from '../src/lib/shipping.js';
+import { shippingPrice, validatePostalCode } from '../src/lib/shipping.js';
+import { sendEmail, emailLayout } from './_email.js';
 
 const cors = {
   'Access-Control-Allow-Origin': process.env.PUBLIC_SITE_URL || '*',
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
 
     const { items, customer } = req.body || {};
     if (!Array.isArray(items) || !items.length) return res.status(400).json({ error: 'El carrito está vacío.' });
-    for (const field of ['name', 'phone', 'address', 'city', 'postal_code']) {
+    for (const field of ['name', 'email', 'phone', 'address', 'city', 'postal_code']) {
       if (!customer?.[field]?.trim()) return res.status(400).json({ error: 'Completá todos los datos de entrega.' });
     }
 
@@ -46,7 +47,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Una de las prendas está agotada o ya no está disponible. Actualizá tu carrito.' });
     }
 
-    const zone = String(customer.shipping_zone || 'amba');
+    const postal = validatePostalCode(customer.postal_code);
+    if (!postal.valid) return res.status(400).json({ error: postal.message || 'El CPA no es válido.' });
+    const zone = postal.zone;
     const method = customer.shipping_method === 'branch' ? 'branch' : 'home';
     const shippingAmountForZone = shippingPrice(zone, method, false);
     if (shippingAmountForZone == null) return res.status(400).json({ error: 'La zona de envío seleccionada no es válida.' });
@@ -88,7 +91,8 @@ export default async function handler(req, res) {
       customer_phone: customer.phone.trim(),
       shipping_address: customer.address.trim(),
       shipping_city: customer.city.trim(),
-      shipping_postal_code: customer.postal_code.trim(),
+      shipping_postal_code: postal.normalized,
+      customer_email: customer.email.trim().toLowerCase(),
       shipping_zone: zone,
       shipping_method: method,
       shipping_amount: shippingAmount,
@@ -103,6 +107,15 @@ export default async function handler(req, res) {
       throw itemsError;
     }
 
+    const orderCode = order.id.slice(0, 8).toUpperCase();
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+    const customerEmail = customer.email.trim().toLowerCase();
+    const safe = (value) => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const orderHtml = `<h2>Nuevo pedido #${orderCode}</h2><p><b>${safe(customer.name)}</b> realizó un pedido.</p><p>Email: ${safe(customerEmail)}<br>Teléfono: ${safe(customer.phone)}<br>Entrega: ${safe(customer.address)}, ${safe(customer.city)} · CPA ${safe(postal.normalized)}<br>Modalidad: ${method === 'branch' ? 'Sucursal' : 'Domicilio'}</p><p>Prendas: $${subtotal.toLocaleString('es-AR')}<br>Envío: $${shippingAmount.toLocaleString('es-AR')}<br><b>Total: $${grandTotal.toLocaleString('es-AR')}</b></p><p>Estado: pendiente de comprobante y aprobación manual.</p>`;
+    await Promise.all([
+      sendEmail({ to: adminEmail, subject: `SS22 · Nuevo pedido #${orderCode} — requiere comprobante`, html: emailLayout(orderHtml) }),
+      sendEmail({ to: customerEmail, subject: `SS22 · Recibimos tu pedido #${orderCode}`, html: emailLayout(`<h2>¡Gracias por tu compra!</h2><p>Hola ${safe(customer.name)}, registramos tu pedido <b>#${orderCode}</b>.</p><p><b>Total a transferir: $${grandTotal.toLocaleString('es-AR')}</b></p><p>Alias: <b>ss22.www</b><br>Titular: Matheo Martinez</p><p>Enviá el comprobante respondiendo este correo, por WhatsApp al 11 5415-4628 o por Instagram @ss22.www. El pedido se confirma cuando verifiquemos el pago.</p><p>Te enviaremos la información del despacho y seguimiento a este correo.</p>`) }),
+    ]);
     return res.status(201).json({ order: { id: order.id, subtotal, shipping_amount: shippingAmount, total: grandTotal } });
   } catch (error) {
     console.error('create-order:', error);

@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 import { money } from "../lib/format";
 
 const statuses = ["pending_payment", "shipping_quoted", "paid", "ordered", "in_transit", "arrived", "ready", "completed", "cancelled"];
-const statusLabels = { pending_payment: "Pendiente de cotización", shipping_quoted: "Envío cotizado · pendiente de pago", paid: "Pago confirmado", ordered: "Preparando pedido", in_transit: "En camino", arrived: "En sucursal", ready: "Listo para retirar", completed: "Entregado", cancelled: "Cancelado" };
+const statusLabels = { pending_payment: "Pedido nuevo · revisar comprobante", shipping_quoted: "Esperando comprobante / pago", paid: "Pago confirmado", ordered: "Preparando pedido", in_transit: "En camino", arrived: "En sucursal", ready: "Listo para retirar", completed: "Entregado", cancelled: "Cancelado" };
 const emptyPromotion = { name: "", target_type: "all", target_value: "", discount_percent: 10, free_shipping: false, active: true };
 const emptyProduct = { name: "", category: "Remeras", price: "", description: "", image_url: "", sizes: "S,M,L,XL", colors: "Negro,Blanco", featured: false, active: true, stock_status: "available", media_urls: [], video_url: "" };
 
@@ -120,9 +120,19 @@ export default function Admin() {
     if (error) setError(error.message); else { setNotice("Promoción eliminada."); refresh(); }
   }
 
+  async function notifyOrder(orderId, payload) {
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session?.access_token) return;
+      const response = await fetch("/api/order-notification", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session.access_token}` }, body: JSON.stringify({ order_id: orderId, ...payload }) });
+      const result = await response.json();
+      if (result.sent) setNotice("Estado guardado y correo enviado al cliente.");
+      else setNotice("Estado guardado. El correo no se envió: configurá Resend y EMAIL_FROM en Vercel.");
+    } catch { setNotice("Estado guardado. No se pudo confirmar el envío del correo."); }
+  }
   async function updateStatus(id, status) {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-    if (error) setError(error.message); else refresh();
+    if (error) setError(error.message); else { await notifyOrder(id, { status }); await refresh(); }
   }
   async function updateShipping(id, amount) {
     const value = amount === "" ? null : Number(amount);
@@ -139,8 +149,9 @@ export default function Admin() {
     if (error) setError(error.message); else { setNotice(next === "sold_out" ? "Prenda marcada como agotada." : "Prenda nuevamente disponible."); refresh(); }
   }
   async function updateTracking(id, tracking) {
-    const { error } = await supabase.from("orders").update({ tracking_number: tracking.trim() || null }).eq("id", id);
-    if (error) setError(error.message); else setNotice("Seguimiento guardado.");
+    const value = tracking.trim() || null;
+    const { error } = await supabase.from("orders").update({ tracking_number: value }).eq("id", id);
+    if (error) setError(error.message); else { setNotice("Seguimiento guardado."); if (value) await notifyOrder(id, { tracking_number: value }); }
   }
 
   return <main className="page container admin-page">
@@ -189,7 +200,7 @@ export default function Admin() {
     </section>
     <section className="admin-section"><h2>Pedidos y envíos ({orders.length})</h2>
       {orders.map(o => <article className="admin-order-card" key={o.id}>
-        <div><b>Pedido #{o.id.slice(0,8).toUpperCase()}</b><span>{o.customer_name} · {o.customer_phone}</span><span>{o.shipping_address}, {o.shipping_city} · CP {o.shipping_postal_code || "Sin CP"}</span><span>Entrega: {o.shipping_method === "branch" ? "Sucursal Correo Argentino" : "Domicilio"} · Zona: {o.shipping_zone || "AMBA"}</span><span>Productos: {money(o.total_amount)} · Envío: {o.shipping_amount == null ? "A cotizar" : Number(o.shipping_amount) === 0 ? "GRATIS" : money(o.shipping_amount)}</span>{o.order_items?.map((item, i) => <span key={item.id || i}>{item.quantity} × {item.name} · Talle {item.size || "—"} · {item.color || "—"}</span>)}</div>
+        <div><b>Pedido #{o.id.slice(0,8).toUpperCase()}</b><span>{o.customer_name} · {o.customer_phone}</span><span>Correo del comprador: <a href={`mailto:${o.customer_email || ""}`}>{o.customer_email || "No informado (pedido anterior)"}</a></span><span>{o.shipping_address}, {o.shipping_city} · CP {o.shipping_postal_code || "Sin CP"}</span><span>Entrega: {o.shipping_method === "branch" ? "Sucursal Correo Argentino" : "Domicilio"} · Zona: {o.shipping_zone || "AMBA"}</span><span>Productos: {money(o.total_amount)} · Envío: {o.shipping_amount == null ? "A cotizar" : Number(o.shipping_amount) === 0 ? "GRATIS" : money(o.shipping_amount)}</span>{o.order_items?.map((item, i) => <span key={item.id || i}>{item.quantity} × {item.name} · Talle {item.size || "—"} · {item.color || "—"}</span>)}</div>
         <div className="admin-order-controls"><a className="button button-outline small" href="https://micorreo.correoargentino.com.ar/" target="_blank" rel="noreferrer">Consultar tarifa oficial ↗</a><label>Ajustar envío (ARS)<input type="number" min="0" step="1" defaultValue={o.shipping_amount ?? ""} placeholder="Cotizar" onBlur={e => { if (e.target.value !== String(o.shipping_amount ?? "")) updateShipping(o.id, e.target.value); }}/></label>
         <label>Número de seguimiento<input defaultValue={o.tracking_number || ""} placeholder="Pegá el código de Correo Argentino" onBlur={e => { if (e.target.value !== (o.tracking_number || "")) updateTracking(o.id, e.target.value); }}/></label><label>Estado<select value={o.status} onChange={e => updateStatus(o.id, e.target.value)}>{statuses.map(s => <option key={s} value={s}>{statusLabels[s]}</option>)}</select></label></div>
       </article>)}
