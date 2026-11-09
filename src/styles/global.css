@@ -784,3 +784,33 @@ body{background:#fff;color:#111}
 @media (prefers-reduced-motion: reduce) {
   .campaign-image-logo .campaign-spinning-logo { animation: none; }
 }
+
+
+/* SS22 · confianza, consultas de calidad y promociones */
+.info-contact-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.info-contact-links .button{display:inline-flex;align-items:center;gap:9px}
+.info-page section[id]{scroll-margin-top:110px}
+.ss22-promo-strip{padding:38px 0 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ss22-promo-heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:18px}
+.ss22-promo-heading h2,.ss22-trust-panel h2{font:600 clamp(25px,3vw,36px)/1.05 'Space Grotesk';letter-spacing:-1.5px;margin:6px 0 0}
+.ss22-promo-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ss22-promo-item{background:#fff;border:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:7px}
+.ss22-promo-item strong{font:600 14px 'Space Grotesk'}
+.ss22-promo-item span{font-size:12px;font-weight:700;letter-spacing:.7px}
+.ss22-promo-item small{font-size:10px;color:#777}
+.ss22-trust-panel{margin-top:55px;margin-bottom:55px;padding:34px 38px;background:#ecece8;display:grid;grid-template-columns:1.3fr .7fr;gap:30px;align-items:center}
+.ss22-trust-panel p{max-width:650px;color:#666;font-size:12px;line-height:1.8;margin:14px 0 0}
+.ss22-trust-actions{display:flex;flex-direction:column;gap:13px}
+.ss22-trust-actions a,.product-quality-note a{font-size:10px;font-weight:700;letter-spacing:.8px;border-bottom:1px solid #aaa;padding-bottom:8px;width:max-content;max-width:100%}
+.product-quality-note{background:#efefec;padding:17px;margin:20px 0}
+.product-quality-note strong{font-size:12px}
+.product-quality-note p{font-size:11px!important;line-height:1.7;margin:8px 0;color:#555}
+.product-quality-note>div{display:flex;gap:15px;flex-wrap:wrap;margin:10px 0}
+.product-quality-note small{display:block;color:#777;font-size:10px}
+@media(max-width:700px){
+  .info-contact-links{flex-direction:column;align-items:stretch}
+  .info-contact-links .button{width:100%}
+  .ss22-promo-heading{align-items:start;flex-direction:column}
+  .ss22-promo-list{grid-template-columns:1fr}
+  .ss22-trust-panel{grid-template-columns:1fr;padding:25px 20px;margin-top:35px;margin-bottom:35px}
+}

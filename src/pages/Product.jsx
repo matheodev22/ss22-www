@@ -34,6 +34,7 @@ export default function Product() {
         <h2>{money(offer.price)} {offer.discount > 0 && <del className="old-price">{money(offer.originalPrice)}</del>}</h2>
         {offer.discount > 0 && <p className="offer-note">-{offer.discount}% de descuento aplicado</p>}
         <p>{product.description}</p>
+        <div className="product-quality-note"><strong>¿Querés ver más detalles?</strong><p>Pedinos fotos, videos o información sobre la calidad por Instagram o WhatsApp antes de comprar.</p><div><a href="https://www.instagram.com/ss22.www/" target="_blank" rel="noreferrer">Instagram</a><a href={`https://wa.me/5491154154628?text=${encodeURIComponent(`Hola SS22, quiero consultar detalles de ${product.name}.`)}`} target="_blank" rel="noreferrer">WhatsApp</a></div><small>Prenda nueva, sin uso y con su bolsa.</small></div>
         <p className={`stock-label ${product.stock_status === "sold_out" ? "out" : ""}`}>{product.stock_status === "sold_out" ? "SIN STOCK" : "STOCK DISPONIBLE"}</p>
         <div className="option-group"><strong>Talle</strong><div className="option-list">{(product.sizes || ["Único"]).map(s => <button key={s} className={size === s ? "selected" : ""} onClick={() => setSize(s)}>{s}</button>)}</div></div>
         {product.colors?.length > 0 && <div className="option-group"><strong>Color</strong><div className="option-list">{product.colors.map(c => <button key={c} className={color === c ? "selected" : ""} onClick={() => setColor(c)}>{c}</button>)}</div></div>}
