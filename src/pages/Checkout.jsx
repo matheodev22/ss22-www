@@ -93,7 +93,7 @@ export default function Checkout() {
           <label><input type="radio" name="shipping_method" value="branch" checked={form.shipping_method === "branch"} onChange={change}/> Retiro en sucursal de Correo Argentino</label>
         </fieldset>
         {form.shipping_method === "branch" && postal.valid && <p className="shipping-branch-info">{getBranchPickupInfo(postal.zone)}</p>}
-        <p className="shipping-delivery-note">Plazo estimado: 2 a 5 días hábiles desde el despacho.</p>
+        <p className="shipping-delivery-note">(en caso de promociones de envío gratis solo aplicable en sucursales) Plazo estimado: 2 a 5 días hábiles desde el despacho.</p>
         <label>Indicaciones (opcional)<textarea name="notes" value={form.notes} onChange={change} placeholder="Piso, departamento u otra información útil"/></label>
         <div className="payment-method-note"><strong>Pago por transferencia</strong><span>El pedido se registra con el total de prendas y envío. Encontrarás los datos de pago en Mis pedidos.</span></div>
         {message && <p className="notice" role="alert">{message}</p>}
