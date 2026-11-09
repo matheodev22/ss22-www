@@ -54,7 +54,7 @@ export default function Product() {
           {offer.freeShipping && <p className="offer-note">Esta prenda tiene envío gratis.</p>}
         </section>
         <div className="deposit-box"><span>Precio de la prenda × {quantity}</span><strong>{money(offer.price * quantity)}</strong><small>El envío se suma en el checkout según la zona y modalidad elegidas.</small></div>
-        <button className="button button-dark full-button" disabled={product.stock_status === "sold_out"} onClick={() => { addItem({ ...product, applied_price: offer.price, discount_percent: offer.discount, free_shipping: offer.freeShipping }, size, color); navigate("/carrito"); }}><ShoppingBag size={17}/> {product.stock_status === "sold_out" ? "Sin stock" : "Agregar al carrito"}</button>
+        <button className="button button-dark full-button" disabled={product.stock_status === "sold_out"} onClick={() => { addItem({ ...product, applied_price: offer.price, discount_percent: offer.discount, free_shipping: offer.freeShipping }, size, color, quantity); navigate("/carrito"); }}><ShoppingBag size={17}/> {product.stock_status === "sold_out" ? "Sin stock" : "Agregar al carrito"}</button>
       </div>
     </div>
   </main>;
