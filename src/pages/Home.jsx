@@ -34,6 +34,11 @@ export default function Home() {
       <div><CreditCard/><span><b>Pago coordinado</b><small>Transferencia bancaria</small></span></div>
     </section>
 
+    <section className="ss22-promo-strip container ss22-promo-two-items">
+      <div className="ss22-promo-heading"><span className="store-overline">BENEFICIO AUTOMÁTICO</span><h2>10% OFF llevando 2 prendas o más</h2></div>
+      <p>Se aplica automáticamente en el carrito y al confirmar tu pedido. No necesitás ingresar ningún cupón.</p>
+    </section>
+
     {(promotions.length > 0) && <section className="ss22-promo-strip container">
       <div className="ss22-promo-heading"><span className="store-overline">BENEFICIOS ACTIVOS</span><h2>Promociones SS22</h2></div>
       <div className="ss22-promo-list">{promotions.map(p => <article className="ss22-promo-item" key={p.id}>

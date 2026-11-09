@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { money } from "../lib/format";
 import { supabase } from "../lib/supabase";
-import { getActivePromotions, getProductOffer, cartHasFreeShipping } from "../lib/promotions";
+import { getActivePromotions, getProductOffer, cartHasFreeShipping, getCartPricing } from "../lib/promotions";
 import { shippingPrice, validatePostalCode, getBranchPickupInfo } from "../lib/shipping";
 
 export default function Checkout() {
@@ -20,7 +20,8 @@ export default function Checkout() {
   useEffect(() => { if (user?.email) setForm(current => ({ ...current, email: current.email || user.email })); }, [user?.email]);
   function change(e) { setForm(current => ({ ...current, [e.target.name]: e.target.value })); }
 
-  const subtotal = useMemo(() => items.reduce((sum, item) => sum + getProductOffer(item.product, promotions).price * item.quantity, 0), [items, promotions]);
+  const cartPricing = useMemo(() => getCartPricing(items, promotions), [items, promotions]);
+  const subtotal = cartPricing.subtotal;
   const freeShipping = useMemo(() => cartHasFreeShipping(items, promotions), [items, promotions]);
   const postal = validatePostalCode(form.postal_code);
   const shippingZone = postal.valid ? postal.zone : null;
@@ -48,7 +49,7 @@ export default function Checkout() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo registrar el pedido.");
-      setCreatedOrder(data.order); clearCart();
+      setCreatedOrder({ ...data.order, emails: data.emails || {} }); clearCart();
     } catch (error) { setMessage(error.message); }
     finally { setBusy(false); }
   }
@@ -59,6 +60,8 @@ export default function Checkout() {
     <section className="transfer-card">
       <p>Registramos tu pedido <strong>#{createdOrder.id.slice(0,8).toUpperCase()}</strong>.</p>
       <p>Te enviaremos las novedades a <strong>{form.email}</strong>.</p>
+      {createdOrder.emails?.customer?.sent ? <p className="notice">Te enviamos el correo de confirmación.</p> : <p className="notice">El pedido quedó registrado, pero no pudimos enviar el correo de confirmación. Podés continuar con la transferencia y contactarnos por WhatsApp.</p>}
+      {createdOrder.emails?.admin?.sent === false && <p className="fine-print">La notificación interna por correo tampoco pudo enviarse; el pedido igualmente quedó guardado en el sistema.</p>}
       <h2>Transferencia bancaria</h2>
       <div className="transfer-detail"><span>Alias</span><strong>ss22.www</strong><button type="button" className="button button-outline small" onClick={() => navigator.clipboard?.writeText("ss22.www")}>Copiar alias</button></div>
       <div className="transfer-detail"><span>Titular</span><strong>Matheo Martinez</strong></div>
@@ -98,9 +101,10 @@ export default function Checkout() {
       </form>
       <aside className="summary-card"><p className="eyebrow">TU COMPRA</p>
         {items.map(item => { const offer = getProductOffer(item.product, promotions); return <div key={item.key}><span>{item.product.name} × {item.quantity}{offer.discount ? ` · -${offer.discount}%` : ""}</span><strong>{money(offer.price * item.quantity)}</strong></div>; })}
-        <hr/><div><span>Subtotal con descuentos</span><strong>{money(subtotal)}</strong></div>
+        <hr/><div><span>Subtotal de prendas</span><strong>{money(cartPricing.productSubtotal)}</strong></div>{cartPricing.qualifiesForTwo && <div><span>10% OFF por 2 o más prendas</span><strong>-{money(cartPricing.twoGarmentDiscount)}</strong></div>}<div><span>Total de prendas</span><strong>{money(subtotal)}</strong></div>
         <div><span>Envío {freeShipping ? "(promoción)" : ""}</span><strong>{freeShipping ? "GRATIS" : shipping == null ? "A calcular" : money(shipping)}</strong></div>
         <div className="checkout-grand-total"><span>Total</span><strong>{money(grandTotal)}</strong></div>
+        {cartPricing.qualifiesForTwo && <small className="offer-note">¡Se aplicó el 10% por comprar 2 o más prendas!</small>}
         {freeShipping && <small className="offer-note">¡Tu carrito tiene envío gratis!</small>}
         <small>Precios estimados de SS22. El código postal debe tener 4 números y estar dentro de un rango postal argentino reconocido. Entrega estimada: 2 a 5 días hábiles desde el despacho.</small>
       </aside>

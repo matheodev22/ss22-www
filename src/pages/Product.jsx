@@ -33,6 +33,7 @@ export default function Product() {
       <div className="detail-copy"><p className="eyebrow">{product.category}</p><h1>{product.name}<span>.</span></h1>
         <h2>{money(offer.price)} {offer.discount > 0 && <del className="old-price">{money(offer.originalPrice)}</del>}</h2>
         {offer.discount > 0 && <p className="offer-note">-{offer.discount}% de descuento aplicado</p>}
+        <p className="offer-note">10% OFF llevando 2 prendas o más. Se aplica automáticamente en el carrito.</p>
         <p>{product.description}</p>
         <div className="product-quality-note"><strong>¿Querés ver más detalles?</strong><p>Pedinos fotos, videos o información sobre la calidad por Instagram o WhatsApp antes de comprar.</p><div><a href="https://www.instagram.com/ss22.www/" target="_blank" rel="noreferrer">Instagram</a><a href={`https://wa.me/5491154154628?text=${encodeURIComponent(`Hola SS22, quiero consultar detalles de ${product.name}.`)}`} target="_blank" rel="noreferrer">WhatsApp</a></div><small>Prenda nueva, sin uso y con su bolsa.</small></div>
         <p className={`stock-label ${product.stock_status === "sold_out" ? "out" : ""}`}>{product.stock_status === "sold_out" ? "SIN STOCK" : "STOCK DISPONIBLE"}</p>

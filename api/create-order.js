@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { shippingPrice, validatePostalCode } from '../src/lib/shipping.js';
-import { sendEmail, emailLayout } from './_email.js';
+import { sendEmail, emailLayout, safeText } from './_email.js';
 
 const cors = {
   'Access-Control-Allow-Origin': process.env.PUBLIC_SITE_URL || '*',
@@ -58,6 +58,11 @@ export default async function handler(req, res) {
 
     const productMap = new Map(products.map(product => [product.id, product]));
     let freeShipping = false;
+    const garmentCount = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    if (!Number.isInteger(garmentCount) || garmentCount < 1 || garmentCount > 100) {
+      return res.status(400).json({ error: 'La cantidad de prendas no es válida.' });
+    }
+    const qualifiesForTwo = garmentCount >= 2;
     const orderItems = items.map(item => {
       const product = productMap.get(item.product_id);
       const quantity = Number(item.quantity);
@@ -65,7 +70,8 @@ export default async function handler(req, res) {
       const applicable = (promotions || []).filter(p => matches(p, product));
       const discount = applicable.reduce((best, p) => Math.max(best, Number(p.discount_percent) || 0), 0);
       if (applicable.some(p => p.free_shipping)) freeShipping = true;
-      const unitPrice = Math.max(0, Math.round(Number(product.price) * (100 - discount) / 100));
+      const promotionalUnitPrice = Math.max(0, Math.round(Number(product.price) * (100 - discount) / 100));
+      const unitPrice = qualifiesForTwo ? Math.max(0, Math.round(promotionalUnitPrice * 0.90)) : promotionalUnitPrice;
       return {
         product_id: product.id,
         name: product.name,
@@ -110,13 +116,14 @@ export default async function handler(req, res) {
     const orderCode = order.id.slice(0, 8).toUpperCase();
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
     const customerEmail = customer.email.trim().toLowerCase();
-    const safe = (value) => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const orderHtml = `<h2>Nuevo pedido #${orderCode}</h2><p><b>${safe(customer.name)}</b> realizó un pedido.</p><p>Email: ${safe(customerEmail)}<br>Teléfono: ${safe(customer.phone)}<br>Entrega: ${safe(customer.address)}, ${safe(customer.city)} · CPA ${safe(postal.normalized)}<br>Modalidad: ${method === 'branch' ? 'Sucursal' : 'Domicilio'}</p><p>Prendas: $${subtotal.toLocaleString('es-AR')}<br>Envío: $${shippingAmount.toLocaleString('es-AR')}<br><b>Total: $${grandTotal.toLocaleString('es-AR')}</b></p><p>Estado: pendiente de comprobante y aprobación manual.</p>`;
-    await Promise.all([
+    const safe = safeText;
+    const orderHtml = `<h2>Nuevo pedido #${orderCode}</h2><p><b>${safe(customer.name)}</b> realizó un pedido.</p><p>Email: ${safe(customerEmail)}<br>Teléfono: ${safe(customer.phone)}<br>Entrega: ${safe(customer.address)}, ${safe(customer.city)} · CP ${safe(postal.normalized)}<br>Modalidad: ${method === 'branch' ? 'Sucursal' : 'Domicilio'}</p><p>Prendas: $${subtotal.toLocaleString('es-AR')}<br>Envío: $${shippingAmount.toLocaleString('es-AR')}<br><b>Total: $${grandTotal.toLocaleString('es-AR')}</b></p><p>Estado: pendiente de comprobante y aprobación manual.</p>`;
+    const customerHtml = `<h2>¡Gracias por tu compra!</h2><p>Hola ${safe(customer.name)}, registramos tu pedido <b>#${orderCode}</b>.</p><p><b>Total a transferir: $${grandTotal.toLocaleString('es-AR')}</b></p><p>Alias: <b>ss22.www</b><br>Titular: Matheo Martinez</p><p>Enviá el comprobante por WhatsApp al 11 5415-4628 o por Instagram @ss22.www. El pedido se confirma cuando verifiquemos el pago.</p><p>Te enviaremos la información del despacho y seguimiento a este correo.</p>`;
+    const [adminMailResult, customerMailResult] = await Promise.all([
       sendEmail({ to: adminEmail, subject: `SS22 · Nuevo pedido #${orderCode} — requiere comprobante`, html: emailLayout(orderHtml) }),
-      sendEmail({ to: customerEmail, subject: `SS22 · Recibimos tu pedido #${orderCode}`, html: emailLayout(`<h2>¡Gracias por tu compra!</h2><p>Hola ${safe(customer.name)}, registramos tu pedido <b>#${orderCode}</b>.</p><p><b>Total a transferir: $${grandTotal.toLocaleString('es-AR')}</b></p><p>Alias: <b>ss22.www</b><br>Titular: Matheo Martinez</p><p>Enviá el comprobante respondiendo este correo, por WhatsApp al 11 5415-4628 o por Instagram @ss22.www. El pedido se confirma cuando verifiquemos el pago.</p><p>Te enviaremos la información del despacho y seguimiento a este correo.</p>`) }),
+      sendEmail({ to: customerEmail, subject: `SS22 · Recibimos tu pedido #${orderCode}`, html: emailLayout(customerHtml) }),
     ]);
-    return res.status(201).json({ order: { id: order.id, subtotal, shipping_amount: shippingAmount, total: grandTotal } });
+    return res.status(201).json({ order: { id: order.id, subtotal, shipping_amount: shippingAmount, total: grandTotal }, emails: { admin: adminMailResult, customer: customerMailResult }, promotion: { buy_two_applied: qualifiesForTwo, percent: qualifiesForTwo ? 10 : 0 } });
   } catch (error) {
     console.error('create-order:', error);
     return res.status(500).json({ error: error.message || 'No se pudo crear el pedido.' });

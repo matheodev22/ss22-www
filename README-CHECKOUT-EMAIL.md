@@ -1,25 +1,37 @@
 # SS22 · Checkout, transferencia y correos
 
-## Flujo de compra
-1. El comprador completa nombre, email, teléfono y dirección.
-2. Ingresa su CPA argentino completo (formato `B1704ABC`). La zona se determina en el navegador y se vuelve a validar en el servidor; no hay selector manual de localidad o zona.
-3. Se crea el pedido como `shipping_quoted`, pendiente de comprobante/verificación.
-4. El comprador recibe el alias `ss22.www`, titular Matheo Martinez y vías de contacto.
-5. Administración recibe el aviso de nuevo pedido y puede cambiar su estado. Al aprobar el pago, despachar o cargar seguimiento, se envía una actualización al comprador.
+## Correos automáticos
+El servidor intenta enviar:
+1. Al crear el pedido: aviso al administrador y confirmación al cliente con alias, titular y total.
+2. Al aprobar el pago (`paid`): confirmación al cliente.
+3. Al marcar el pedido en camino (`in_transit`) o guardar el seguimiento: aviso con código y enlace de Correo Argentino.
+4. Al marcarlo listo para retirar / llegado a sucursal: actualización al cliente.
 
-## Requisitos de base de datos
-Ejecutar `supabase/ss22-checkout-email-y-promociones.sql` en Supabase → SQL Editor. Esto crea `store_promotions`, corrige el constraint de estados y agrega el email del comprador. No elimina productos ni pedidos.
+Un fallo del proveedor de correo no borra ni invalida el pedido. La respuesta del checkout distingue si se pudo enviar el aviso al administrador y al comprador. En el panel también se muestra si la actualización por email fue rechazada.
 
-## Correos automáticos (Resend)
-Crear una cuenta en Resend, verificar el dominio remitente y agregar estas variables en Vercel → Settings → Environment Variables:
+## Variables de entorno de Vercel
+Configurar en **Vercel → Project → Settings → Environment Variables** (Production y Preview, si se usan):
+- `SUPABASE_URL`: URL del proyecto Supabase.
+- `SUPABASE_SERVICE_ROLE_KEY`: clave secreta service role; solo servidor, nunca `VITE_`.
+- `PUBLIC_SITE_URL`: URL de la tienda publicada.
 - `RESEND_API_KEY`: clave privada de Resend.
-- `EMAIL_FROM`: remitente verificado, por ejemplo `SS22.WWW <pedidos@tudominio.com>`.
-- `ADMIN_NOTIFICATION_EMAIL`: correo donde querés recibir avisos de pedidos.
+- `EMAIL_FROM`: remitente autorizado en Resend.
+- `ADMIN_NOTIFICATION_EMAIL`: email de la cuenta administradora.
 
-Las variables de Supabase privadas ya requeridas por el backend deben seguir configuradas. Después de agregarlas, redeploy en Vercel. Si no se configuran, los pedidos igualmente se registran, pero los emails no se envían.
+Después de cambiar variables, hacer un nuevo deploy. No incluir `.env.local` ni claves en el ZIP o en GitHub.
 
-## Validación de CPA
-Se exige el formato CPA de 8 caracteres (letra provincial + cuatro dígitos + tres letras) y se rechazan provincias/rangos numéricos manifiestamente incompatibles. Sin una base postal oficial completa o consulta de Correo Argentino no es técnicamente posible garantizar que las tres letras finales existan y correspondan a la dirección exacta. Por eso el administrador debe verificar dirección/CPA antes de despachar. No presentar esta validación como verificación oficial de domicilio. Correo Argentino confirma que no publica una base masiva de CPA y que la consulta oficial se realiza por dirección; ver https://www.correoargentino.com.ar/formularios/cpa.
+## Limitación de Resend sin dominio propio verificado
+Con `EMAIL_FROM=SS22 <onboarding@resend.dev>`, Resend está en modo de prueba: permite enviar al email dueño de la cuenta de Resend, pero no a los correos de compradores. Por eso, sin verificar un dominio propio, el aviso al administrador puede probarse si `ADMIN_NOTIFICATION_EMAIL` es exactamente el email de la cuenta Resend, pero las confirmaciones reales a clientes serán rechazadas (normalmente HTTP 403). Para enviar a compradores se necesita verificar un dominio que controles y usar un remitente de ese dominio. No sirve usar una dirección Gmail como remitente ni verificar un dominio ajeno.
 
-## Prueba antes de publicar
-Hacer una compra de prueba con una cuenta cliente, comprobar que se guarde `customer_email`, que el pedido aparezca en administración y que lleguen ambos correos. Cambiar estado a `paid`, luego a `in_transit` y guardar seguimiento para verificar las notificaciones al cliente.
+## Base de datos
+Si todavía no se ejecutó, abrir Supabase → SQL Editor y ejecutar `supabase/ss22-checkout-email-y-promociones.sql`. Crea `store_promotions`, agrega `customer_email` y los campos de envío/seguimiento que usa el checkout, y recarga el schema cache. Ejecutar una sola vez es seguro por los `IF NOT EXISTS` incluidos.
+
+## Prueba
+1. Hacer un pedido de prueba con una cuenta de cliente y un email válido.
+2. Confirmar que el pedido se guarde y aparezca en `/admin`.
+3. Confirmar que llegue el aviso al email administrador.
+4. Aprobar el pago y luego marcar `in_transit` / cargar seguimiento para comprobar las notificaciones.
+5. Revisar los resultados de envío en la pantalla y los logs de Vercel si Resend rechaza el mensaje.
+
+## Promoción automática
+Al comprar dos prendas o más se aplica automáticamente un 10% adicional sobre el subtotal de prendas, después de las promociones individuales activas. El servidor vuelve a calcularlo antes de guardar el pedido; no depende del navegador.

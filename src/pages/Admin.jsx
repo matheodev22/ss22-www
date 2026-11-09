@@ -127,8 +127,14 @@ export default function Admin() {
       const response = await fetch("/api/order-notification", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session.access_token}` }, body: JSON.stringify({ order_id: orderId, ...payload }) });
       const result = await response.json();
       if (result.sent) setNotice("Estado guardado y correo enviado al cliente.");
-      else setNotice("Estado guardado. El correo no se envió: configurá Resend y EMAIL_FROM en Vercel.");
-    } catch { setNotice("Estado guardado. No se pudo confirmar el envío del correo."); }
+      else {
+        const reason = result.reason === "email_not_configured" ? "faltan RESEND_API_KEY o EMAIL_FROM en Vercel" :
+          result.reason === "provider_rejected" ? `Resend rechazó el envío (HTTP ${result.provider_status || "?"}); revisá EMAIL_FROM y el dominio verificado` :
+          result.reason === "missing_customer_email" ? "el pedido no tiene un email de cliente" :
+          "no se pudo conectar con el servicio de correo";
+        setNotice(`Estado guardado, pero no se envió el correo: ${reason}.`);
+      }
+    } catch { setNotice("Estado guardado, pero no se pudo confirmar el envío del correo."); }
   }
   async function updateStatus(id, status) {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);

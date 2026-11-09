@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { sendEmail, emailLayout } from './_email.js';
+import { sendEmail, emailLayout, safeText } from './_email.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido.' });
@@ -18,11 +18,14 @@ export default async function handler(req, res) {
     const email = order.customer_email;
     if (!email) return res.status(200).json({ sent: false, reason: 'missing_customer_email' });
     const code = order.id.slice(0, 8).toUpperCase();
-    const safe = v => String(v || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const safe = safeText;
+    const statusLabels = { pending_payment: 'Pendiente de pago', shipping_quoted: 'Esperando comprobante', paid: 'Pago confirmado', ordered: 'En preparación', in_transit: 'En camino', arrived: 'Llegó a sucursal', ready: 'Listo para retirar', completed: 'Entregado', cancelled: 'Cancelado' };
     let subject = `SS22 · Actualización de tu pedido #${code}`;
-    let content = `<h2>Actualizamos tu pedido</h2><p>Tu pedido <b>#${code}</b> cambió de estado: <b>${safe(status || order.status)}</b>.</p>`;
-    if (status === 'paid') content = `<h2>¡Pago confirmado!</h2><p>Verificamos tu transferencia del pedido <b>#${code}</b>. Ya comenzaremos a preparar tu compra.</p>`;
-    if (status === 'in_transit' || tracking_number) content += `<p>Tu pedido fue despachado.${tracking_number ? `<br>Número de seguimiento: <b>${safe(tracking_number)}</b>` : ''}<br>Podés seguirlo en <a href="https://www.correoargentino.com.ar/formularios/e-commerce?id=${encodeURIComponent(tracking_number || '')}">Correo Argentino</a>.</p>`;
+    const currentStatus = status || order.status;
+    let content = `<h2>Actualizamos tu pedido</h2><p>Tu pedido <b>#${code}</b> cambió de estado: <b>${safe(statusLabels[currentStatus] || currentStatus)}</b>.</p>`;
+    if (status === 'paid') { subject = `SS22 · Pago confirmado para tu pedido #${code}`; content = `<h2>¡Pago confirmado!</h2><p>Verificamos tu transferencia del pedido <b>#${code}</b>. Ya comenzaremos a preparar tu compra.</p>`; }
+    if (status === 'in_transit' || tracking_number) { subject = `SS22 · Tu pedido #${code} está en camino`; content += `<p>Tu pedido fue despachado.${tracking_number ? `<br>Número de seguimiento: <b>${safe(tracking_number)}</b>` : ''}<br>Podés seguirlo en <a href="https://www.correoargentino.com.ar/formularios/e-commerce?id=${encodeURIComponent(tracking_number || '')}">Correo Argentino</a>.</p>`;
+    }
     if (status === 'ready' || status === 'arrived') content += `<p>Tu paquete ya está disponible para retirar / llegó a la sucursal indicada. Revisá el seguimiento para confirmar los detalles.</p>`;
     const result = await sendEmail({ to: email, subject, html: emailLayout(content) });
     return res.status(200).json(result);

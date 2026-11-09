@@ -38,3 +38,27 @@ export function getProductOffer(product, promotions = []) {
 export function cartHasFreeShipping(items, promotions = []) {
   return items.some(item => getProductOffer(item.product, promotions).freeShipping);
 }
+
+
+// Beneficio automático SS22: 10% adicional al subtotal de prendas
+// cuando el carrito contiene dos o más unidades.
+export function getCartPricing(items = [], promotions = []) {
+  const garmentCount = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  const qualifiesForTwo = garmentCount >= 2;
+  const productSubtotal = items.reduce((sum, item) => {
+    return sum + getProductOffer(item.product, promotions).price * Number(item.quantity || 0);
+  }, 0);
+  // Redondeo por unidad idéntico al cálculo del servidor para que el total coincida.
+  const subtotal = items.reduce((sum, item) => {
+    const unitPrice = getProductOffer(item.product, promotions).price;
+    const discountedUnitPrice = qualifiesForTwo ? Math.round(unitPrice * 0.90) : unitPrice;
+    return sum + discountedUnitPrice * Number(item.quantity || 0);
+  }, 0);
+  return {
+    productSubtotal,
+    garmentCount,
+    qualifiesForTwo,
+    twoGarmentDiscount: Math.max(0, productSubtotal - subtotal),
+    subtotal,
+  };
+}
